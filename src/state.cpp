@@ -9,6 +9,10 @@ namespace exo {
 		stack.pop();
 	}	
 	
+	void state::set(int i, const value &v) {
+		stack.set_in_frame(i, v);
+	}
+	
 	value state::get(int i) {
 		return stack.get_in_frame(i);
 	}

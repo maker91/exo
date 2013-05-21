@@ -3,6 +3,7 @@
 #include <vector>
 #include "opcode.h"
 #include "state.h"
+#include "value.h"
 
 namespace exo {
 	
@@ -11,11 +12,10 @@ namespace exo {
 		std::vector<instruction> 	i_store;
 		std::vector<value>			k_store;
 		
-		instruction *pc;
-		
 	public:
 		function();
 		function(const std::vector<instruction> &);
+		function(const std::vector<instruction> &, const std::vector<value> &);
 		
 		~function();
 		
