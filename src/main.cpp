@@ -8,16 +8,18 @@
 
 int main() {
 	exo::state E;
-	E.push("first");
-	E.push("second");
+	E.push(1);
 	
 	E.stack.print_stack();
 	std::cout << std::endl;
 
 	try {
 		exo::function f({
-			MAKE_ABC(exo::opcodes::MOVE, 1, 0, 0, 0, 0),
+			MAKE_ABx(exo::opcodes::JZR, 0, 0, 1),
+			MAKE_ABC(exo::opcodes::LOADK, 1, 0, 0, 0, 0),
 			MAKE_ABC(exo::opcodes::RTN, 0, 0, 0, 0, 0)
+		}, {
+			"constant"
 		});
 		
 		f.call(&E);
@@ -25,6 +27,7 @@ int main() {
 		std::cout << "error: " << e.what() << std::endl;
 	}
 	
+	std::cout << std::endl;
 	E.stack.print_stack();
 
 	return 0;

@@ -5,11 +5,13 @@
 
 /*
 	instruction format:
-		OP R[A] kR[B] kR[C]
-		OOOOOO AAAAAAAA KBBBBBBBB KCCCCCCCC
+		ABC:
+			OP R[A] kR[B] kR[C]
+			OOOOOO AAAAAAAA KBBBBBBBB KCCCCCCCC
 		
-		OP R[A] SBx
-		OOOOOO AAAAAAAA SBBBBBBBB BBBBBBBB
+		ABx:
+			OP R[A] SBx
+			OOOOOO AAAAAAAA SBBBBBBBB BBBBBBBB
 */
 
 #define GET_OP(i) 	exo::opcodes::opcode((i>>26) & 0xFF)
@@ -34,6 +36,7 @@ namespace exo {
 			LOADK,
 			MOVE,
 			JMP,
+			JZR,
 			RTN
 		};
 	}	

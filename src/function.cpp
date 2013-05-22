@@ -44,6 +44,11 @@ namespace exo {
 				pc += GET_Bx(I);
 				break;
 				
+			case opcodes::JZR:
+				if (E->get(GET_A(I)).to_integer() == 0)
+					pc += GET_Bx(I);
+				break;
+				
 			case opcodes::LOADK:
 				E->set(GET_A(I), k_store[GET_B(I)]);
 				break;
