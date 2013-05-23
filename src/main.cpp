@@ -8,18 +8,19 @@
 
 int main() {
 	exo::state E;
-	E.push(1);
+	E.push(1000000);
 	
 	E.stack.print_stack();
 	std::cout << std::endl;
 
 	try {
 		exo::function f({
-			MAKE_ABx(exo::opcodes::JZR, 0, 0, 1),
-			MAKE_ABC(exo::opcodes::LOADK, 1, 0, 0, 0, 0),
+			MAKE_ABC(exo::opcodes::ADD, 0, 0, 0, 1, 0),
+			MAKE_ABx(exo::opcodes::JZR, 0, 0, 2),
+			MAKE_ABx(exo::opcodes::JMP, 0, 1, 2),			
 			MAKE_ABC(exo::opcodes::RTN, 0, 0, 0, 0, 0)
 		}, {
-			"constant"
+			-1
 		});
 		
 		f.call(&E);

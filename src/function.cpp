@@ -30,8 +30,6 @@ namespace exo {
 		while (true) {	
 			exo::instruction I = *pc;
 			exo::opcodes::opcode OP = GET_OP(I);
-			
-			std::cout << I << " (" << OP << ")" << std::endl;
 		
 			switch (OP) {
 			case opcodes::NOOP:
@@ -41,12 +39,12 @@ namespace exo {
 				return GET_A(I);
 				
 			case opcodes::JMP:
-				pc += GET_Bx(I);
+				pc += (int)GET_Bx(I) - 1;
 				break;
 				
 			case opcodes::JZR:
 				if (E->get(GET_A(I)).to_integer() == 0)
-					pc += GET_Bx(I);
+					pc += (int)GET_Bx(I) - 1;
 				break;
 				
 			case opcodes::LOADK:
@@ -56,6 +54,25 @@ namespace exo {
 			case opcodes::MOVE:
 				E->set(GET_B(I), E->get(GET_A(I)));
 				break;
+				
+			case opcodes::ADD: 
+				{
+					value b;
+					if (IS_BK(I))
+						b = k_store[GET_B(I)];
+					else
+						b = E->get(GET_B(I));
+						
+					value c;
+					if (IS_CK(I))
+						c = k_store[GET_C(I)];
+					else
+						c = E->get(GET_C(I));
+						
+					E->set(GET_A(I), b+c);
+					
+					break;
+				}
 			}
 			
 			pc++;
