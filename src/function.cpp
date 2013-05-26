@@ -63,6 +63,10 @@ namespace exo {
 				E->set(GET_A(I), k_store[GET_B(I)]);
 				break;
 				
+			case opcodes::LOADNIL:
+				E->set(GET_A(I), value());
+				break;
+				
 			case opcodes::MOVE:
 				E->set(GET_B(I), E->get(GET_A(I)));
 				break;
