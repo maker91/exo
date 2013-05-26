@@ -2,6 +2,18 @@
 
 #include <iostream>
 
+#define GET_RKB(I, b)			\
+	if (IS_BK(I))				\
+		b = k_store[GET_B(I)]; 	\
+	else 						\
+		b = E->get(GET_B(I)); 	\
+		
+#define GET_RKC(I, c)			\
+	if (IS_CK(I))				\
+		c = k_store[GET_C(I)]; 	\
+	else 						\
+		c = E->get(GET_C(I)); 	\
+
 namespace exo {
 
 	function::function() {
@@ -57,20 +69,41 @@ namespace exo {
 				
 			case opcodes::ADD: 
 				{
-					value b;
-					if (IS_BK(I))
-						b = k_store[GET_B(I)];
-					else
-						b = E->get(GET_B(I));
-						
-					value c;
-					if (IS_CK(I))
-						c = k_store[GET_C(I)];
-					else
-						c = E->get(GET_C(I));
+					value b, c;
+					GET_RKB(I, b);
+					GET_RKC(I, c);
 						
 					E->set(GET_A(I), b+c);
-					
+					break;
+				}
+				
+			case opcodes::SUB: 
+				{
+					value b, c;
+					GET_RKB(I, b);
+					GET_RKC(I, c);
+						
+					E->set(GET_A(I), b-c);
+					break;
+				}
+				
+			case opcodes::MUL: 
+				{
+					value b, c;
+					GET_RKB(I, b);
+					GET_RKC(I, c);
+						
+					E->set(GET_A(I), b*c);
+					break;
+				}
+				
+			case opcodes::DIV: 
+				{
+					value b, c;
+					GET_RKB(I, b);
+					GET_RKC(I, c);
+						
+					E->set(GET_A(I), b/c);
 					break;
 				}
 			}

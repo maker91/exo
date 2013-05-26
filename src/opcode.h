@@ -40,7 +40,10 @@ namespace exo {
 			JZR,		// if R[A] == 0 then pc+= Bx
 			RTN,		// return R[A]
 			
-			ADD			// R[A] = KR[B] + KR[C]
+			ADD,		// R[A] = KR[B] + KR[C]
+			SUB,		// R[A] = KR[B] + KR[C]
+			MUL,		// R[A] = KR[B] + KR[C]
+			DIV,		// R[A] = KR[B] + KR[C]
 		};
 	}	
 }
