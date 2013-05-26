@@ -47,9 +47,6 @@ namespace exo {
 			case opcodes::NOOP:
 				break;
 				
-			case opcodes::RTN:
-				return GET_A(I);
-				
 			case opcodes::JMP:
 				pc += (int)GET_Bx(I) - 1;
 				break;
@@ -73,6 +70,13 @@ namespace exo {
 				
 			case opcodes::MOVE:
 				E->set(GET_B(I), E->get(GET_A(I)));
+				break;
+				
+			case opcodes::RTN:
+				return GET_A(I)-1;
+				
+			case opcodes::CALL:
+				E->get(GET_B(I)).call(E, GET_B(I)-1, GET_C(I)-1);
 				break;
 				
 			case opcodes::ADD: 

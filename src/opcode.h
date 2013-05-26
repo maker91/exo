@@ -34,13 +34,16 @@ namespace exo {
 		
 		enum opcode {
 			NOOP,		// 
+			
 			LOADK,		// R[A] = K[B]
 			LOADBOOL,	// R[A] = Bool(B)
 			LOADNIL,	// R[A] = nil
 			MOVE,		// R[B] = R[A]
+			
 			JMP,		// pc += Bx
 			JZR,		// if R[A] == 0 then pc+= Bx
-			RTN,		// return R[A]
+			RTN,		// return R[top - A-1]...R[top] 									(A-1==-1 -> return whole stack minus parameters)
+			CALL,		// R[top - A-1]...R[top] = R[B](R[top - C-1]...R[top]) 				(A-1==-1 -> accept all returns) (C-1==-1 -> pass whole stack as parameters)
 			
 			ADD,		// R[A] = KR[B] + KR[C]
 			SUB,		// R[A] = KR[B] + KR[C]
