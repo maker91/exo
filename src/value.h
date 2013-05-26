@@ -51,6 +51,7 @@ namespace exo {
 		
 		bool operator==(const value &o) const;
 		bool operator<(const value &o) const;
+		bool operator<=(const value &o) const;
 		
 		value get(const value &) const;
 		void set(const value &, const value &);

@@ -346,6 +346,10 @@ namespace exo {
 		}	
 	}
 	
+	bool value::operator<=(const value &o) const {
+		return (*this < o)||(*this == o);
+	}
+	
 	value value::get(const value &o) const {
 		switch (type) {
 		case LIST:

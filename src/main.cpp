@@ -14,8 +14,13 @@ int main() {
 
 	try {
 		exo::function f({
+			MAKE_ABC(exo::opcodes::LOADK, 0, 0, 0, 0, 0),
+			MAKE_AtBx(exo::opcodes::TEST, 0, 0, 0, 3),
+			MAKE_ABC(exo::opcodes::LOADK, 0, 0, 1, 0, 0),
+			MAKE_ABx(exo::opcodes::JMP, 0, 0, 2),
+			MAKE_ABC(exo::opcodes::LOADK, 0, 0, 2, 0, 0),
 			MAKE_ABC(exo::opcodes::RTN, 1, 0, 0, 0, 0)
-		});
+		}, {true, "TRUE", "FALSE"});
 		
 		f.call(&E);
 	} catch (std::exception &e) {

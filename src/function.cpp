@@ -1,18 +1,16 @@
 #include "function.h"
 
 #include <iostream>
+	
+#define GET_RA(I)	(E->get(GET_A(I)))
+#define GET_RB(I)	(E->get(GET_B(I)))
+#define GET_RC(I)	(E->get(GET_C(I)))
 
-#define GET_RKB(I, b)			\
-	if (IS_BK(I))				\
-		b = k_store[GET_B(I)]; 	\
-	else 						\
-		b = E->get(GET_B(I)); 	\
-		
-#define GET_RKC(I, c)			\
-	if (IS_CK(I))				\
-		c = k_store[GET_C(I)]; 	\
-	else 						\
-		c = E->get(GET_C(I)); 	\
+#define GET_KB(I)	(k_store[GET_B(I)])
+#define GET_KC(I)	(k_store[GET_C(I)])
+
+#define GET_RKB(I)	(IS_BK(I) ? GET_KB(I) : GET_RB(I))
+#define GET_RKC(I)	(IS_CK(I) ? GET_KC(I) : GET_RC(I))
 
 namespace exo {
 
@@ -52,7 +50,7 @@ namespace exo {
 				break;
 				
 			case opcodes::TEST:
-				if (E->get(GET_A(I)).to_boolean() == (exo::boolean)GET_T(I))
+				if (GET_RA(I).to_boolean() == (exo::boolean)GET_T(I))
 					pc += (int)GET_Bx(I) - 1;
 				break;
 				
@@ -69,55 +67,43 @@ namespace exo {
 				break;
 				
 			case opcodes::MOVE:
-				E->set(GET_B(I), E->get(GET_A(I)));
+				E->set(GET_B(I), GET_RA(I));
 				break;
 				
 			case opcodes::RTN:
 				return GET_A(I)-1;
 				
 			case opcodes::CALL:
-				E->get(GET_B(I)).call(E, GET_B(I)-1, GET_C(I)-1);
+				GET_RB(I).call(E, GET_B(I)-1, GET_C(I)-1);
 				break;
 				
-			case opcodes::ADD: 
-				{
-					value b, c;
-					GET_RKB(I, b);
-					GET_RKC(I, c);
-						
-					E->set(GET_A(I), b+c);
-					break;
-				}
+			case opcodes::EQL:
+				E->set(GET_A(I), GET_RKB(I) == GET_RKC(I));
+				break;
 				
+			case opcodes::LT:
+				E->set(GET_A(I), GET_RKB(I) < GET_RKC(I));
+				break;
+				
+			case opcodes::LE:
+				E->set(GET_A(I), GET_RKB(I) <= GET_RKC(I));
+				break;
+				
+			case opcodes::ADD: 	
+				E->set(GET_A(I), GET_RKB(I) + GET_RKC(I));
+				break;
+					
 			case opcodes::SUB: 
-				{
-					value b, c;
-					GET_RKB(I, b);
-					GET_RKC(I, c);
-						
-					E->set(GET_A(I), b-c);
-					break;
-				}
+				E->set(GET_A(I), GET_RKB(I) - GET_RKC(I));
+				break;
 				
 			case opcodes::MUL: 
-				{
-					value b, c;
-					GET_RKB(I, b);
-					GET_RKC(I, c);
-						
-					E->set(GET_A(I), b*c);
-					break;
-				}
+				E->set(GET_A(I), GET_RKB(I) * GET_RKC(I));
+				break;
 				
 			case opcodes::DIV: 
-				{
-					value b, c;
-					GET_RKB(I, b);
-					GET_RKC(I, c);
-						
-					E->set(GET_A(I), b/c);
-					break;
-				}
+				E->set(GET_A(I), GET_RKB(I) / GET_RKC(I));
+				break;
 			}
 			
 			pc++;

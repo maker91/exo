@@ -35,7 +35,7 @@
 
 #define MAKE_ABC(i, A, bk, B, ck, C)	(((i&0x3F)<<26)|((A&0xFF)<<18)|((bk&0x01)<<17)|((B&0xFF)<<9)|((ck&0x01)<<8)|(C&0xFF))
 #define MAKE_ABx(i, A, bs, B)			(((i&0x3F)<<26)|((A&0xFF)<<18)|((bs&0x01)<<16)|(B&0xFFFF))
-#define MAKE_AtBx(i, A, T, bs, B)		MAKE_ABx(i, A, bs, B)|((t&0x01)<<17)			
+#define MAKE_AtBx(i, A, T, bs, B)		MAKE_ABx(i, A, bs, B)|((T&0x01)<<17)			
 
 namespace exo {
 	typedef std::uint32_t instruction;
@@ -54,6 +54,10 @@ namespace exo {
 			TEST,		// if R[A] == Bool(T) then pc += Bx
 			RTN,		// return R[top - A-1]...R[top] 									(A-1==-1 -> return whole stack minus parameters)
 			CALL,		// R[top - A-1]...R[top] = R[B](R[top - C-1]...R[top]) 				(A-1==-1 -> accept all returns) (C-1==-1 -> pass whole stack as parameters)
+			
+			EQL,		// R[A] = RK[B]==RK[C]
+			LT,			// R[A] = RK[B]<RK[C]
+			LE,			// R[A] = RK[B]<=RK[C]
 			
 			ADD,		// R[A] = KR[B] + KR[C]
 			SUB,		// R[A] = KR[B] + KR[C]
