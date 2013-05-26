@@ -35,6 +35,7 @@ namespace exo {
 		enum opcode {
 			NOOP,		// 
 			LOADK,		// R[A] = K[B]
+			LOADBOOL,	// R[A] = Bool(B)
 			LOADNIL,	// R[A] = nil
 			MOVE,		// R[B] = R[A]
 			JMP,		// pc += Bx
