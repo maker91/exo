@@ -17,7 +17,7 @@
 namespace exo {
 
 	function::function() {
-		i_store.push_back(opcodes::RTN << 26);
+		i_store.push_back(MAKE_ABC(opcodes::RTN, 1, 0, 0, 0, 0));
 	}
 	
 	function::function(const std::vector<instruction> &s)
@@ -51,8 +51,8 @@ namespace exo {
 				pc += (int)GET_Bx(I) - 1;
 				break;
 				
-			case opcodes::JZR:
-				if (E->get(GET_A(I)).to_integer() == 0)
+			case opcodes::TEST:
+				if (E->get(GET_A(I)).to_boolean() == (exo::boolean)GET_T(I))
 					pc += (int)GET_Bx(I) - 1;
 				break;
 				

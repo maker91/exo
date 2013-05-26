@@ -14,17 +14,7 @@ int main() {
 
 	try {
 		exo::function f({
-			MAKE_ABC(exo::opcodes::LOADK, 0, 0, 0, 0, 0),
-			MAKE_ABC(exo::opcodes::ADD, 0, 0, 0, 1, 1),
-			MAKE_ABx(exo::opcodes::JZR, 0, 0, 4),
-			
-			MAKE_ABC(exo::opcodes::MUL, 1, 0, 0, 1, 2),
-			MAKE_ABC(exo::opcodes::SUB, 1, 1, 0, 0, 1),
-			
-			MAKE_ABx(exo::opcodes::JMP, 0, 1, 4),			
-			MAKE_ABC(exo::opcodes::RTN, 0, 0, 0, 0, 0)
-		}, {
-			1000000, -1, 2
+			MAKE_ABC(exo::opcodes::RTN, 1, 0, 0, 0, 0)
 		});
 		
 		f.call(&E);
