@@ -26,7 +26,8 @@ namespace exo {
 			LPAREN,			// (
 			RPAREN,			// )
 			
-			ACCESS,			// .
+			OBJACCESS,		// .
+			NAMESPACE,		// ::
 			
 			ADD,			// +
 			SUB,			// -
@@ -54,6 +55,14 @@ namespace exo {
 			BAND,			// &
 			BOR,			// |
 			BXOR,			// @
+			
+			IF, 			// if
+			ELSE,			// else
+			FOR,			// for
+			WHILE,			// while
+			DO,				// do
+			BREAK,			// break
+			CONTINUE,		// continue
 		};
 	}
 }
