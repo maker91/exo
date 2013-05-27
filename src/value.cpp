@@ -3,6 +3,7 @@
 #include "state.h"
 
 #include <iostream>
+#include <cstdio>
 
 namespace exo {
 	/*
@@ -269,7 +270,9 @@ namespace exo {
 		case INTEGER:					
 		case BYTE:		
 		case LIST:
-		case MAP:			
+		case MAP:
+		case NFUNCTION:
+		case FUNCTION:
 		case STRING:
 			return true;
 			
@@ -295,9 +298,13 @@ namespace exo {
 		case BOOLEAN:
 			return u_bool ? "true" : "false";
 			
-		case LIST:			
+		case LIST:
 		case MAP:
-			return type_name(type);
+			{
+				char c[20];
+				snprintf(c, 20, "0x%p", (void *)u_map);
+				return std::string(c);
+			}
 			
 		case STRING:
 			return u_string;
@@ -341,8 +348,13 @@ namespace exo {
 		case STRING:
 			return u_string < o.u_string;
 			
-		default:
+		case NUMBER:
+		case INTEGER:
+		case BYTE:
 			return data < o.data;
+			
+		default:
+			throw invalid_comparison_error(type, o.type);
 		}	
 	}
 	
