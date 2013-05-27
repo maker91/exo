@@ -59,6 +59,15 @@ namespace exo {
 			LT,			// R[A] = RK[B]<RK[C]
 			LE,			// R[A] = RK[B]<=RK[C]
 			
+			AND,		// R[A] = RK[B] && RK[C]
+			OR,			// R[A] = RK[B] || RK[C]
+			NOT,		// R[A] = !RK[B]
+			
+			BAND,		// R[A] = RK[B] & RK[C]
+			BOR,		// R[A] = RK[B] | RK[C]
+			BXOR,		// R[A] = RK[B] @ RK[C]
+			BNOT,		// R[A] = ~RK[B]
+			
 			ADD,		// R[A] = RK[B] + RK[C]
 			SUB,		// R[A] = RK[B] + RK[C]
 			MUL,		// R[A] = RK[B] + RK[C]

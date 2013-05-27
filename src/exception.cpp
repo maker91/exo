@@ -23,6 +23,9 @@ namespace exo {
 	invalid_binop_error::invalid_binop_error(type a, type b) noexcept
 		: error(std::string("attempt to perform binary operation on ") + type_name(a) + " and " + type_name(b)) {}
 		
+	invalid_unop_error::invalid_unop_error(type a) noexcept
+		: error(std::string("attempt to perform unary operation on ") + type_name(a)) {}
+		
 	invalid_call_error::invalid_call_error(type a) noexcept
 		: error(std::string("attempt to call a " + type_name(a) + " value")) {}
 		

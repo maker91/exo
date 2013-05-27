@@ -57,13 +57,17 @@ namespace exo {
 		void set(const value &, const value &);
 		
 		integer size() const;
+		value pow(const value &) const;
 		
 		value operator+(const value &) const;
 		value operator-(const value &) const;
 		value operator*(const value &) const;
 		value operator/(const value &) const;
-		value operator^(const value &) const;
 		value operator%(const value &) const;
+		value operator&(const value &) const;
+		value operator|(const value &) const;
+		value operator^(const value &) const;
+		value operator~() const;
 	};
 	
 	

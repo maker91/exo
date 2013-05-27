@@ -43,6 +43,11 @@ namespace exo {
 		invalid_binop_error(type, type) noexcept;
 	};
 	
+	class invalid_unop_error : public error {
+	public:
+		invalid_unop_error(type) noexcept;
+	};
+	
 	class invalid_call_error : public error {
 	public:
 		invalid_call_error(type) noexcept;

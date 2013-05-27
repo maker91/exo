@@ -456,6 +456,25 @@ namespace exo {
 		}	
 	}
 	
+	value value::pow(const value &o) const {
+		value a, b;
+		promote(*this, o, a, b);
+		
+		if (a.get_type() == NIL || b.get_type() == NIL)
+			throw invalid_binop_error(a.get_type(), b.get_type());
+			
+		switch (a.get_type()) {
+		case NUMBER:
+			return std::pow(a.u_num, b.u_num);
+		case INTEGER:
+			return std::pow(a.u_int, b.u_int);
+		case BYTE:
+			return std::pow(a.u_byte, b.u_byte);
+		default:
+			throw invalid_binop_error(a.get_type(), b.get_type());
+		}
+	}
+	
 	value value::operator+(const value &o) const {
 		value a, b;
 		promote(*this, o, a, b);
@@ -532,25 +551,6 @@ namespace exo {
 		}
 	}
 	
-	value value::operator^(const value &o) const {
-		value a, b;
-		promote(*this, o, a, b);
-		
-		if (a.get_type() == NIL || b.get_type() == NIL)
-			throw invalid_binop_error(a.get_type(), b.get_type());
-			
-		switch (a.get_type()) {
-		case NUMBER:
-			return std::pow(a.u_num, b.u_num);
-		case INTEGER:
-			return std::pow(a.u_int, b.u_int);
-		case BYTE:
-			return std::pow(a.u_byte, b.u_byte);
-		default:
-			throw invalid_binop_error(a.get_type(), b.get_type());
-		}
-	}
-	
 	value value::operator%(const value &o) const {
 		value a, b;
 		promote(*this, o, a, b);
@@ -569,4 +569,66 @@ namespace exo {
 			throw invalid_binop_error(a.get_type(), b.get_type());
 		}
 	}
+	
+	value value::operator&(const value &o) const {
+		value a, b;
+		promote(*this, o, a, b);
+		
+		if (a.get_type() == NIL || b.get_type() == NIL)
+			throw invalid_binop_error(a.get_type(), b.get_type());
+			
+		switch (a.get_type()) {
+		case INTEGER:
+			return a.u_int & b.u_int;
+		case BYTE:
+			return a.u_byte & b.u_byte;
+		default:
+			throw invalid_binop_error(a.get_type(), b.get_type());
+		}
+	}
+	
+	value value::operator|(const value &o) const {
+		value a, b;
+		promote(*this, o, a, b);
+		
+		if (a.get_type() == NIL || b.get_type() == NIL)
+			throw invalid_binop_error(a.get_type(), b.get_type());
+			
+		switch (a.get_type()) {
+		case INTEGER:
+			return a.u_int | b.u_int;
+		case BYTE:
+			return a.u_byte | b.u_byte;
+		default:
+			throw invalid_binop_error(a.get_type(), b.get_type());
+		}
+	}
+	
+	value value::operator^(const value &o) const {
+		value a, b;
+		promote(*this, o, a, b);
+		
+		if (a.get_type() == NIL || b.get_type() == NIL)
+			throw invalid_binop_error(a.get_type(), b.get_type());
+			
+		switch (a.get_type()) {
+		case INTEGER:
+			return a.u_int ^ b.u_int;
+		case BYTE:
+			return a.u_byte ^ b.u_byte;
+		default:
+			throw invalid_binop_error(a.get_type(), b.get_type());
+		}
+	}
+	
+	value value::operator~() const {
+		switch (type) {
+		case INTEGER:
+			return ~u_int;
+		case BYTE:
+			return ~u_byte;
+		default:
+			throw invalid_unop_error(type);
+		}
+	}	
 }

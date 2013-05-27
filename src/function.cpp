@@ -91,6 +91,34 @@ namespace exo {
 				SET_R(E, GET_A(I), GET_RKB(E, I) <= GET_RKC(E, I));
 				break;
 				
+			case opcodes::AND:
+				SET_R(E, GET_A(I), GET_RKB(E, I).to_boolean() && GET_RKC(E, I).to_boolean());
+				break;
+				
+			case opcodes::OR:
+				SET_R(E, GET_A(I), GET_RKB(E, I).to_boolean() || GET_RKC(E, I).to_boolean());
+				break;
+				
+			case opcodes::NOT:
+				SET_R(E, GET_A(I), !GET_RKB(E, I).to_boolean());
+				break;
+				
+			case opcodes::BAND:
+				SET_R(E, GET_A(I), GET_RKB(E, I) & GET_RKC(E, I));
+				break;
+				
+			case opcodes::BOR:
+				SET_R(E, GET_A(I), GET_RKB(E, I) | GET_RKC(E, I));
+				break;
+				
+			case opcodes::BXOR:
+				SET_R(E, GET_A(I), GET_RKB(E, I) ^ GET_RKC(E, I));
+				break;
+				
+			case opcodes::BNOT:
+				SET_R(E, GET_A(I), ~GET_RKB(E, I));
+				break;
+				
 			case opcodes::ADD: 	
 				SET_R(E, GET_A(I), GET_RKB(E, I) + GET_RKC(E, I));
 				break;
@@ -108,7 +136,7 @@ namespace exo {
 				break;
 				
 			case opcodes::POW: 
-				SET_R(E, GET_A(I), GET_RKB(E, I) ^ GET_RKC(E, I));
+				SET_R(E, GET_A(I), GET_RKB(E, I).pow(GET_RKC(E, I)));
 				break;
 				
 			case opcodes::MOD: 
