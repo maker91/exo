@@ -59,18 +59,15 @@ namespace exo {
 			LT,			// R[A] = RK[B]<RK[C]
 			LE,			// R[A] = RK[B]<=RK[C]
 			
-			ADD,		// R[A] = KR[B] + KR[C]
-			SUB,		// R[A] = KR[B] + KR[C]
-			MUL,		// R[A] = KR[B] + KR[C]
-			DIV,		// R[A] = KR[B] + KR[C]
+			ADD,		// R[A] = RK[B] + RK[C]
+			SUB,		// R[A] = RK[B] + RK[C]
+			MUL,		// R[A] = RK[B] + RK[C]
+			DIV,		// R[A] = RK[B] + RK[C]
 			
-			//LISTNEW,	
-			//LISTSET,
-			//LISTGET,
-			
-			//MAPNEW,
-			//MAPSET,
-			//MAPGET,
+			NEWLIST,	// R[A] = list
+			NEWMAP,		// R[A] = map
+			SET,		// R[A][RK[B]] = RK[C]
+			GET,		// R[A] = R[B][RK[C]]
 		};
 	}	
 }

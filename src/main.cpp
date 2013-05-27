@@ -8,15 +8,13 @@
 
 int main() {
 	exo::state E;
-	E.push(10);
-	E.push("10");
 	
 	E.stack.print_stack();
 	std::cout << std::endl;
 
 	try {
 		exo::function f({
-			MAKE_ABC(exo::opcodes::LT, 2, 0, 0, 0, 1),
+			MAKE_ABC(exo::opcodes::NEWLIST, 0, 0, 0, 0, 0),
 			MAKE_ABC(exo::opcodes::RTN, 1, 0, 0, 0, 0),
 		});
 		

@@ -1,16 +1,18 @@
-#include "function.h"
-
 #include <iostream>
+
+#include "function.h"
 	
-#define GET_RA(I)	(E->get(GET_A(I)))
-#define GET_RB(I)	(E->get(GET_B(I)))
-#define GET_RC(I)	(E->get(GET_C(I)))
+#define GET_RA(E, I)	(E->get(GET_A(I)))
+#define GET_RB(E, I)	(E->get(GET_B(I)))
+#define GET_RC(E, I)	(E->get(GET_C(I)))
 
-#define GET_KB(I)	(k_store[GET_B(I)])
-#define GET_KC(I)	(k_store[GET_C(I)])
+#define GET_KB(I)		(k_store[GET_B(I)])
+#define GET_KC(I)		(k_store[GET_C(I)])
 
-#define GET_RKB(I)	(IS_BK(I) ? GET_KB(I) : GET_RB(I))
-#define GET_RKC(I)	(IS_CK(I) ? GET_KC(I) : GET_RC(I))
+#define GET_RKB(E, I)	(IS_BK(I) ? GET_KB(I) : GET_RB(E, I))
+#define GET_RKC(E, I)	(IS_CK(I) ? GET_KC(I) : GET_RC(E, I))
+
+#define SET_R(E, N, V)	(E->set(N, V))
 
 namespace exo {
 
@@ -50,59 +52,75 @@ namespace exo {
 				break;
 				
 			case opcodes::TEST:
-				if (GET_RA(I).to_boolean() == (exo::boolean)GET_T(I))
+				if (GET_RA(E, I).to_boolean() == (exo::boolean)GET_T(I))
 					pc += (int)GET_Bx(I) - 1;
 				break;
 				
 			case opcodes::LOADK:
-				E->set(GET_A(I), k_store[GET_B(I)]);
+				SET_R(E, GET_A(I), GET_KB(I));
 				break;
 				
 			case opcodes::LOADBOOL:
-				E->set(GET_A(I), (exo::boolean)GET_B(I));
+				SET_R(E, GET_A(I), (exo::boolean)GET_B(I));
 				break;
 				
 			case opcodes::LOADNIL:
-				E->set(GET_A(I), value());
+				SET_R(E, GET_A(I), value());
 				break;
 				
 			case opcodes::MOVE:
-				E->set(GET_B(I), GET_RA(I));
+				SET_R(E, GET_B(I), GET_RA(E, I));
 				break;
 				
 			case opcodes::RTN:
 				return GET_A(I)-1;
 				
 			case opcodes::CALL:
-				GET_RB(I).call(E, GET_B(I)-1, GET_C(I)-1);
+				GET_RB(E, I).call(E, GET_B(I)-1, GET_C(I)-1);
 				break;
 				
 			case opcodes::EQL:
-				E->set(GET_A(I), GET_RKB(I) == GET_RKC(I));
+				SET_R(E, GET_A(I), GET_RKB(E, I) == GET_RKC(E, I));
 				break;
 				
 			case opcodes::LT:
-				E->set(GET_A(I), GET_RKB(I) < GET_RKC(I));
+				SET_R(E, GET_A(I), GET_RKB(E, I) < GET_RKC(E, I));
 				break;
 				
 			case opcodes::LE:
-				E->set(GET_A(I), GET_RKB(I) <= GET_RKC(I));
+				SET_R(E, GET_A(I), GET_RKB(E, I) <= GET_RKC(E, I));
 				break;
 				
 			case opcodes::ADD: 	
-				E->set(GET_A(I), GET_RKB(I) + GET_RKC(I));
+				SET_R(E, GET_A(I), GET_RKB(E, I) + GET_RKC(E, I));
 				break;
 					
 			case opcodes::SUB: 
-				E->set(GET_A(I), GET_RKB(I) - GET_RKC(I));
+				SET_R(E, GET_A(I), GET_RKB(E, I) - GET_RKC(E, I));
 				break;
 				
 			case opcodes::MUL: 
-				E->set(GET_A(I), GET_RKB(I) * GET_RKC(I));
+				SET_R(E, GET_A(I), GET_RKB(E, I) * GET_RKC(E, I));
 				break;
 				
 			case opcodes::DIV: 
-				E->set(GET_A(I), GET_RKB(I) / GET_RKC(I));
+				SET_R(E, GET_A(I), GET_RKB(E, I) / GET_RKC(E, I));
+				break;
+				
+			case opcodes::NEWLIST:
+				SET_R(E, GET_A(I), new list);
+				break;
+				
+			case opcodes::NEWMAP:
+				SET_R(E, GET_A(I), new map);
+				break;
+				
+			case opcodes::SET:
+				GET_RA(E, I).set(GET_RKB(E, I), GET_RKC(E, I));
+				break;
+				
+			case opcodes::GET:
+				SET_R(E, GET_A(I), GET_RKB(E, I).get(GET_RKC(E, I)));
 				break;
 			}
 			
