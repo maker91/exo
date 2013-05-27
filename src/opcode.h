@@ -63,6 +63,8 @@ namespace exo {
 			SUB,		// R[A] = RK[B] + RK[C]
 			MUL,		// R[A] = RK[B] + RK[C]
 			DIV,		// R[A] = RK[B] + RK[C]
+			POW,		// R[A] = RK[B] ^ RK[C]
+			MOD,		// R[A] = RK[B] % RK[C]
 			
 			NEWLIST,	// R[A] = list
 			NEWMAP,		// R[A] = map

@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <cstdio>
+#include <cmath>
 
 namespace exo {
 	/*
@@ -526,6 +527,44 @@ namespace exo {
 			return a.u_int / b.u_int;
 		case BYTE:
 			return a.u_byte / b.u_byte;
+		default:
+			throw invalid_binop_error(a.get_type(), b.get_type());
+		}
+	}
+	
+	value value::operator^(const value &o) const {
+		value a, b;
+		promote(*this, o, a, b);
+		
+		if (a.get_type() == NIL || b.get_type() == NIL)
+			throw invalid_binop_error(a.get_type(), b.get_type());
+			
+		switch (a.get_type()) {
+		case NUMBER:
+			return std::pow(a.u_num, b.u_num);
+		case INTEGER:
+			return std::pow(a.u_int, b.u_int);
+		case BYTE:
+			return std::pow(a.u_byte, b.u_byte);
+		default:
+			throw invalid_binop_error(a.get_type(), b.get_type());
+		}
+	}
+	
+	value value::operator%(const value &o) const {
+		value a, b;
+		promote(*this, o, a, b);
+		
+		if (a.get_type() == NIL || b.get_type() == NIL)
+			throw invalid_binop_error(a.get_type(), b.get_type());
+			
+		switch (a.get_type()) {
+		case NUMBER:
+			return std::fmod(a.u_num, b.u_num);
+		case INTEGER:
+			return a.u_int%b.u_int;
+		case BYTE:
+			return a.u_byte%b.u_byte;
 		default:
 			throw invalid_binop_error(a.get_type(), b.get_type());
 		}

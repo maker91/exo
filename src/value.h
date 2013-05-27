@@ -62,6 +62,8 @@ namespace exo {
 		value operator-(const value &) const;
 		value operator*(const value &) const;
 		value operator/(const value &) const;
+		value operator^(const value &) const;
+		value operator%(const value &) const;
 	};
 	
 	

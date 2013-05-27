@@ -107,6 +107,14 @@ namespace exo {
 				SET_R(E, GET_A(I), GET_RKB(E, I) / GET_RKC(E, I));
 				break;
 				
+			case opcodes::POW: 
+				SET_R(E, GET_A(I), GET_RKB(E, I) ^ GET_RKC(E, I));
+				break;
+				
+			case opcodes::MOD: 
+				SET_R(E, GET_A(I), GET_RKB(E, I) % GET_RKC(E, I));
+				break;
+				
 			case opcodes::NEWLIST:
 				SET_R(E, GET_A(I), new list);
 				break;
