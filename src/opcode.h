@@ -68,6 +68,8 @@ namespace exo {
 			NEWMAP,		// R[A] = map
 			SET,		// R[A][RK[B]] = RK[C]
 			GET,		// R[A] = R[B][RK[C]]
+			
+			LEN,		// R[A] = length(RK[B])
 		};
 	}	
 }

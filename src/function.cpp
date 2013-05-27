@@ -122,6 +122,10 @@ namespace exo {
 			case opcodes::GET:
 				SET_R(E, GET_A(I), GET_RKB(E, I).get(GET_RKC(E, I)));
 				break;
+				
+			case opcodes::LEN:
+				SET_R(E, GET_A(I), GET_RKB(E, I).size());
+				break;
 			}
 			
 			pc++;

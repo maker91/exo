@@ -451,7 +451,7 @@ namespace exo {
 			return u_string.size();
 		
 		default:
-			throw error(std::string("attempt to get size of ") + type_name(type)); 
+			throw invalid_length_error(type); 
 		}	
 	}
 	
