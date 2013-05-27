@@ -53,6 +53,10 @@ namespace exo {
 		invalid_comparison_error(type, type) noexcept;
 	};
 	
+	class invalid_length_error : public error {
+	public:
+		invalid_length_error(type) noexcept;
+	};
 	
 	/*
 		invalid index error

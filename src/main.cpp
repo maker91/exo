@@ -14,8 +14,12 @@ int main() {
 
 	try {
 		exo::function f({
-			MAKE_ABC(exo::opcodes::NEWLIST, 0, 0, 0, 0, 0),
+			MAKE_ABC(exo::opcodes::NEWMAP, 0, 0, 0, 0, 0),
+			MAKE_ABC(exo::opcodes::SET, 0, 1, 0, 1, 1),
+			MAKE_ABC(exo::opcodes::GET, 1, 0, 0, 1, 0),
 			MAKE_ABC(exo::opcodes::RTN, 1, 0, 0, 0, 0),
+		}, {
+			"key", "value"
 		});
 		
 		f.call(&E);
