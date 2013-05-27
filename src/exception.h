@@ -48,6 +48,11 @@ namespace exo {
 		invalid_call_error(type) noexcept;
 	};
 	
+	class invalid_comparison_error : public error {
+	public:
+		invalid_comparison_error(type, type) noexcept;
+	};
+	
 	
 	/*
 		invalid index error
