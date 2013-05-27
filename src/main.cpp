@@ -8,19 +8,17 @@
 
 int main() {
 	exo::state E;
+	E.push(10);
+	E.push("10");
 	
 	E.stack.print_stack();
 	std::cout << std::endl;
 
 	try {
 		exo::function f({
-			MAKE_ABC(exo::opcodes::LOADK, 0, 0, 0, 0, 0),
-			MAKE_AtBx(exo::opcodes::TEST, 0, 0, 0, 3),
-			MAKE_ABC(exo::opcodes::LOADK, 0, 0, 1, 0, 0),
-			MAKE_ABx(exo::opcodes::JMP, 0, 0, 2),
-			MAKE_ABC(exo::opcodes::LOADK, 0, 0, 2, 0, 0),
-			MAKE_ABC(exo::opcodes::RTN, 1, 0, 0, 0, 0)
-		}, {true, "TRUE", "FALSE"});
+			MAKE_ABC(exo::opcodes::EQL, 2, 0, 0, 0, 1),
+			MAKE_ABC(exo::opcodes::RTN, 1, 0, 0, 0, 0),
+		});
 		
 		f.call(&E);
 	} catch (std::exception &e) {
