@@ -52,8 +52,8 @@ namespace exo {
 			
 			JMP,		// pc += Bx
 			TEST,		// if R[A] == Bool(T) then pc += Bx
-			RTN,		// return R[top - A-1]...R[top] 									(A-1==-1 -> return whole stack minus parameters)
-			CALL,		// R[top - A-1]...R[top] = R[B](R[top - C-1]...R[top]) 				(A-1==-1 -> accept all returns) (C-1==-1 -> pass whole stack as parameters)
+			RTN,		// return R[top - A-1]...R[top] 							(A-1==-1 -> return whole stack minus parameters)
+			CALL,		// R[top]...R[top + A-1] = R[B](R[top - C-1]...R[top]) 		(A-1==-1 -> accept all returns) (C-1==-1 -> pass whole stack as parameters)
 			
 			EQL,		// R[A] = RK[B]==RK[C]
 			LT,			// R[A] = RK[B]<RK[C]
@@ -63,6 +63,14 @@ namespace exo {
 			SUB,		// R[A] = KR[B] + KR[C]
 			MUL,		// R[A] = KR[B] + KR[C]
 			DIV,		// R[A] = KR[B] + KR[C]
+			
+			//LISTNEW,	
+			//LISTSET,
+			//LISTGET,
+			
+			//MAPNEW,
+			//MAPSET,
+			//MAPGET,
 		};
 	}	
 }

@@ -16,7 +16,7 @@ int main() {
 
 	try {
 		exo::function f({
-			MAKE_ABC(exo::opcodes::EQL, 2, 0, 0, 0, 1),
+			MAKE_ABC(exo::opcodes::LT, 2, 0, 0, 0, 1),
 			MAKE_ABC(exo::opcodes::RTN, 1, 0, 0, 0, 0),
 		});
 		
