@@ -27,7 +27,7 @@ namespace exo {
 		: error(std::string("attempt to call a " + type_name(a) + " value")) {}
 		
 	invalid_comparison_error::invalid_comparison_error(type a, type b) noexcept
-		: error(std::string("attempt to compare ") + type_name(c) + " with " + type_name(i)) {}
+		: error(std::string("attempt to compare ") + type_name(a) + " with " + type_name(b)) {}
 		
 	invalid_index_error::invalid_index_error(type c, type i) noexcept
 		: error(std::string("attempt to index ") + type_name(c) + " with a " + type_name(i) + " value") {}
