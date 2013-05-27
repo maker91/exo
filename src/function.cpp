@@ -162,6 +162,10 @@ namespace exo {
 			case opcodes::LEN:
 				SET_R(E, GET_A(I), GET_RKB(E, I).size());
 				break;
+				
+			case opcodes::CONCAT:
+				SET_R(E, GET_A(I), GET_RKB(E, I).concat(GET_RKC(E, I)));
+				break;
 			}
 			
 			pc++;

@@ -475,6 +475,17 @@ namespace exo {
 		}
 	}
 	
+	value value::concat(const value &o) const {
+		if (type == NIL || o.type == NIL)
+			throw invalid_concat_error();
+			
+		std::string r;
+		r += to_string();
+		r += o.to_string();
+		
+		return r;
+	}
+	
 	value value::operator+(const value &o) const {
 		value a, b;
 		promote(*this, o, a, b);

@@ -63,6 +63,11 @@ namespace exo {
 		invalid_length_error(type) noexcept;
 	};
 	
+	class invalid_concat_error : public error {
+	public:
+		invalid_concat_error() noexcept;
+	};
+	
 	/*
 		invalid index error
 	*/

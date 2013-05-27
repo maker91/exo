@@ -37,4 +37,7 @@ namespace exo {
 		
 	invalid_index_error::invalid_index_error(type c, type i) noexcept
 		: error(std::string("attempt to index ") + type_name(c) + " with a " + type_name(i) + " value") {}
+		
+	invalid_concat_error::invalid_concat_error() noexcept
+		: error(std::string("attempt to concat a nil value")) {}
 }

@@ -58,6 +58,7 @@ namespace exo {
 		
 		integer size() const;
 		value pow(const value &) const;
+		value concat(const value &) const;
 		
 		value operator+(const value &) const;
 		value operator-(const value &) const;

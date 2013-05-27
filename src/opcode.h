@@ -81,6 +81,7 @@ namespace exo {
 			GET,		// R[A] = R[B][RK[C]]
 			
 			LEN,		// R[A] = length(RK[B])
+			CONCAT,		// R[A] = RK[B] .. RK[C]
 		};
 	}	
 }
