@@ -4,7 +4,7 @@
 
 int main() {
 	try {
-		std::vector<exo::symbol> symbols = exo::tokenise("global hi");
+		std::vector<exo::symbol> symbols = exo::tokenise("while (true) {i = i^i}");
 		
 		for (auto &symbol : symbols) {
 			std::cout << "(" << symbol.tk << ") " << symbol.str << std::endl; 

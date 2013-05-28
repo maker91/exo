@@ -29,7 +29,7 @@ namespace exo {
 			LPAREN,			// (
 			RPAREN,			// )
 			
-			OBJACCESS,		// .
+			ACCESS,			// .
 			NAMESPACE,		// ::
 			
 			ADD,			// +
@@ -57,7 +57,7 @@ namespace exo {
 			BNOT,			// ~
 			BAND,			// &
 			BOR,			// |
-			BXOR,			// @
+			XOR,			// @
 			
 			IF, 			// if
 			ELSE,			// else

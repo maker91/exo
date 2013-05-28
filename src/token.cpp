@@ -22,7 +22,7 @@ namespace exo {
 				
 				while (!std::isspace(*p) && p!=end) {
 					if (!std::isalnum(*p))
-						throw std::runtime_error("unexpected symbol");
+						break;
 						
 					s.push_back(*p);
 					++p;
@@ -55,6 +55,119 @@ namespace exo {
 					symbols.emplace_back(tokens::CONTINUE, str);
 				else
 					symbols.emplace_back(tokens::IDENTIFIER, str);
+			} else if (*p == ',') {
+				symbols.emplace_back(tokens::SEPARATOR, ",");
+				++p;
+			} else if (*p == '=') { // assignment or equals
+				++p;
+				if (*p == '=') {
+					symbols.emplace_back(tokens::EQUAL, "==");
+					++p;
+				} else {
+					symbols.emplace_back(tokens::ASSIGNMENT, "=");
+				}
+			} else if (*p == '[') {
+				symbols.emplace_back(tokens::LINDEX, "[");
+				++p;
+			} else if (*p == ']') {
+				symbols.emplace_back(tokens::RINDEX, "]");
+				++p;
+			} else if (*p == '{') {
+				symbols.emplace_back(tokens::LBRACE, "{");
+				++p;
+			} else if (*p == '}') {
+				symbols.emplace_back(tokens::RBRACE, "}");
+				++p;
+			} else if (*p == '(') {
+				symbols.emplace_back(tokens::LPAREN, "(");
+				++p;
+			} else if (*p == ')') {
+				symbols.emplace_back(tokens::RPAREN, ")");
+				++p;
+			} else if (*p == '.') { // access or concat
+				++p;
+				if (*p == '.') {
+					symbols.emplace_back(tokens::CONCAT, "..");
+					++p;
+				} else {
+					symbols.emplace_back(tokens::ACCESS, ".");
+				}
+			} else if (*p == ':') { // namespace?
+				++p;
+				if (*p == ':') {
+					symbols.emplace_back(tokens::NAMESPACE, "::");
+					++p;
+				} else {
+					throw std::runtime_error("unexpected symbol near ':'");
+				}
+			} else if (*p == '+') {
+				symbols.emplace_back(tokens::ADD, "+");
+				++p;
+			} else if (*p == '-') {
+				symbols.emplace_back(tokens::SUB, "-");
+				++p;
+			} else if (*p == '*') {
+				symbols.emplace_back(tokens::MUL, "*");
+				++p;
+			} else if (*p == '/') {
+				symbols.emplace_back(tokens::DIV, "/");
+				++p;
+			} else if (*p == '^') {
+				symbols.emplace_back(tokens::POW, "^");
+				++p;
+			} else if (*p == '%') {
+				symbols.emplace_back(tokens::MOD, "%");
+				++p;
+			} else if (*p == '#') {
+				symbols.emplace_back(tokens::LEN, "#");
+				++p;
+			} else if (*p == '<') { // LT or LE
+				++p;
+				if (*p == '=') {
+					symbols.emplace_back(tokens::LE, "<=");
+					++p;
+				} else {
+					symbols.emplace_back(tokens::LT, "<");
+				}
+			} else if (*p == '>') { // GT or GE
+				++p;
+				if (*p == '=') {
+					symbols.emplace_back(tokens::GE, ">=");
+					++p;
+				} else {
+					symbols.emplace_back(tokens::GT, ">");
+				}
+			} else if (*p == '!') { // not or noteql
+				++p;
+				if (*p == '=') {
+					symbols.emplace_back(tokens::NOTEQL, "!=");
+					++p;
+				} else {
+					symbols.emplace_back(tokens::NOT, "!");
+				}
+			} else if (*p == '&') { // AND or BAND
+				++p;
+				if (*p == '&') {
+					symbols.emplace_back(tokens::AND, "&&");
+					++p;
+				} else {
+					symbols.emplace_back(tokens::BAND, "&");
+				}
+			} else if (*p == '|') { // OR or BOR
+				++p;
+				if (*p == '|') {
+					symbols.emplace_back(tokens::OR, "||");
+					++p;
+				} else {
+					symbols.emplace_back(tokens::BOR, "|");
+				}
+			} else if (*p == '~') {
+				symbols.emplace_back(tokens::BNOT, "~");
+				++p;
+			} else if (*p == '@') {
+				symbols.emplace_back(tokens::XOR, "@");
+			} else {
+				throw std::runtime_error("unexpected symbol");
 			}
 		}
 		
