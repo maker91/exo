@@ -4,7 +4,7 @@
 
 int main() {
 	try {
-		std::vector<exo::symbol> symbols = exo::tokenise("global test = \"Hello World!\"");
+		std::vector<exo::symbol> symbols = exo::tokenise("function foo() { return \"bar() }");
 		
 		for (auto &symbol : symbols) {
 			std::cout << "(" << symbol.tk << ") " << symbol.str << std::endl; 

@@ -10,8 +10,12 @@ namespace exo {
 		std::vector<char> src_v(std::begin(src), std::end(src));
 		char *end = &src_v[src_v.size()-1]+1;
 		
+		unsigned line = 1;
 		for (char *p=&src_v[0]; p!=end;) {
 			while (std::isspace(*p)) { // skip whitespace
+				if (*p == '\n')
+					line++;
+					
 				++p;
 			}
 		
@@ -98,7 +102,7 @@ namespace exo {
 					symbols.emplace_back(tokens::NAMESPACE, "::");
 					++p;
 				} else {
-					throw std::runtime_error("unexpected symbol near ':'");
+					throw std::runtime_error(std::to_string(line) + ": unexpected symbol near ':'");
 				}
 			} else if (*p == '+') {
 				symbols.emplace_back(tokens::ADD, "+");
@@ -176,7 +180,7 @@ namespace exo {
 					symbols.emplace_back(tokens::CHAR, std::string("")+c);
 					++p;
 				} else {
-					throw std::runtime_error("unfinished char");
+					throw std::runtime_error(std::to_string(line) + ": unfinished char");
 				}
 			} else if (*p == '"') {
 				++p;
@@ -184,7 +188,7 @@ namespace exo {
 				std::vector<char> s;
 				while (*p != '"') {
 					if (*p == '\n' || p == end)
-						throw std::runtime_error("unfinished string");
+						throw std::runtime_error(std::to_string(line) + ": unfinished string");
 						
 					s.push_back(*p);
 					++p;
@@ -195,7 +199,7 @@ namespace exo {
 				std::string str(std::begin(s), std::end(s));
 				symbols.emplace_back(tokens::STRING, str);
 			} else {
-				throw std::runtime_error("unexpected symbol");
+				throw std::runtime_error(std::to_string(line) + ": unexpected symbol");
 			}
 		}
 		
