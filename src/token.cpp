@@ -166,6 +166,34 @@ namespace exo {
 				++p;
 			} else if (*p == '@') {
 				symbols.emplace_back(tokens::XOR, "@");
+				++p;
+			} else if (*p == '\'') {
+				++p;
+				char c = *p;
+				++p;
+				
+				if (*p == '\'') {
+					symbols.emplace_back(tokens::CHAR, std::string("")+c);
+					++p;
+				} else {
+					throw std::runtime_error("unfinished char");
+				}
+			} else if (*p == '"') {
+				++p;
+				
+				std::vector<char> s;
+				while (*p != '"') {
+					if (*p == '\n' || p == end)
+						throw std::runtime_error("unfinished string");
+						
+					s.push_back(*p);
+					++p;
+				}
+				
+				++p;
+				s.push_back('\0');
+				std::string str(std::begin(s), std::end(s));
+				symbols.emplace_back(tokens::STRING, str);
 			} else {
 				throw std::runtime_error("unexpected symbol");
 			}
