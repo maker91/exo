@@ -1,9 +1,12 @@
 #pragma once
 
+#include <vector>
+#include <string>
+
 namespace exo {
 	namespace tokens {
 	
-		enum Token {
+		enum token {
 			INVALID,
 			GLOBAL,			// global
 			IDENTIFIER,		// [_a-zA-Z][_0-9a-zA-Z]+
@@ -65,4 +68,16 @@ namespace exo {
 			CONTINUE,		// continue
 		};
 	}
+	
+	struct symbol {
+		tokens::token 	tk;
+		std::string		str;
+		unsigned int	line;
+		unsigned int	column;
+		
+		symbol(tokens::token t, const std::string &s)
+			: tk(t), str(s), line(0), column(0) {}
+	};
+	
+	std::vector<symbol> tokenise(const std::string &);
 }
