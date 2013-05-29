@@ -19,10 +19,6 @@ namespace exo {
 		
 		~function();
 		
-		function(const function &)=delete;
-		function(function &&)=delete;
-		const function &operator=(const function &)=delete;
-		
 		int call(state *);
 	};
 }
