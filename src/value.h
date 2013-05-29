@@ -4,6 +4,7 @@
 
 namespace exo {
 	class state;
+	class function;
 
 	class value {
 	private:
@@ -19,6 +20,7 @@ namespace exo {
 			string		u_string;
 			list		*u_list;
 			map			*u_map;
+			function	*u_func;
 			nfunction	u_nfunc;
 		};
 		
@@ -35,6 +37,7 @@ namespace exo {
 		value(const char *);
 		value(list *);
 		value(map *);
+		value(function *);
 		value(nfunction);
 	
 		~value();

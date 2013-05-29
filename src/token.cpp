@@ -225,7 +225,7 @@ namespace exo {
 							
 						e = true;
 					} else if (!std::isdigit(*p)) {
-						throw std::runtime_error(std::to_string(line) + ": malformed number");
+						break;
 					}
 					
 					s.push_back(*p);

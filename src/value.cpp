@@ -1,6 +1,7 @@
 #include "value.h"
 #include "exception.h"
 #include "state.h"
+#include "function.h"
 
 #include <iostream>
 #include <cstdio>
@@ -167,11 +168,14 @@ namespace exo {
 	value::value(map *m)
 		: type(MAP), u_map(m) {}
 		
+	value::value(function *f)
+		: type(FUNCTION), u_func(f) {}
+		
 	value::value(nfunction f)
 		: type(NFUNCTION), u_nfunc(f) {}
 		
 	value::~value() {
-		// delete map or list if it is the last reference?
+		// delete map, list or function if it is the last reference?
 	}
 	
 	type value::get_type() const {
@@ -310,19 +314,33 @@ namespace exo {
 		case STRING:
 			return u_string;
 			
+		case FUNCTION:
+			{
+				char c[20];
+				snprintf(c, 20, "0x%p", (void *)u_func);
+				return std::string(c);
+			}
+			
+		case NFUNCTION:
+			return "native function";
+			
 		default:
 			return "nil";
 		}
 	}
 	
 	int value::call(state *s, int args, int rets) {
-		if (type != NFUNCTION)
+		if (type != NFUNCTION && type != FUNCTION)
 			throw invalid_call_error(type);
 		
 		args = args < 0 ? s->stack.frame_size() : args;
 		s->stack.push_frame(args);
 		
-		int act_r = u_nfunc(s);
+		int act_r;
+		if (type == NFUNCTION)
+			act_r = u_nfunc(s);
+		else
+			act_r = u_func->call(s);
 		
 		act_r = act_r < 0 ? s->stack.frame_size() - args : act_r;
 		rets = rets < 0 ? act_r : rets;
