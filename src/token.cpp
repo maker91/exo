@@ -1,7 +1,10 @@
 #include "token.h"
+#include "type.h"
 
+#include <iostream>
 #include <stdexcept>
 #include <cctype>
+#include <cstdlib>
 
 namespace exo {
 
@@ -19,7 +22,7 @@ namespace exo {
 				++p;
 			}
 		
-			if (*p == '_' || std::isalnum(*p)) { // keyword or identifier
+			if (*p == '_' || std::isalpha(*p)) { // keyword or identifier
 				std::vector<char> s;
 				s.push_back(*p);
 				++p;
@@ -88,11 +91,14 @@ namespace exo {
 			} else if (*p == ')') {
 				symbols.emplace_back(tokens::RPAREN, ")");
 				++p;
-			} else if (*p == '.') { // access or concat
+			} else if (*p == '.') { // access or concat or number
 				++p;
 				if (*p == '.') {
 					symbols.emplace_back(tokens::CONCAT, "..");
 					++p;
+				} else if (std::isdigit(*p)) {
+					--p;
+					goto donumber;
 				} else {
 					symbols.emplace_back(tokens::ACCESS, ".");
 				}
@@ -198,6 +204,47 @@ namespace exo {
 				s.push_back('\0');
 				std::string str(std::begin(s), std::end(s));
 				symbols.emplace_back(tokens::STRING, str);
+			} else if (std::isdigit(*p)) {
+			donumber:
+				std::vector<char> s;
+				s.push_back(*p);
+				
+				bool dp = *p == '.';
+				bool e = false;
+				
+				++p;
+				while (!std::isspace(*p) && p != end) {
+					if (*p == '.') {
+						if (dp)
+							throw std::runtime_error(std::to_string(line) + ": malformed number");
+						
+						dp = true;
+					} else if (*p == 'e' || *p == 'E') {
+						if (e)
+							throw std::runtime_error(std::to_string(line) + ": malformed number");
+							
+						e = true;
+					} else if (!std::isdigit(*p)) {
+						throw std::runtime_error(std::to_string(line) + ": malformed number");
+					}
+					
+					s.push_back(*p);
+					++p;
+				}
+				
+				if (s.back() == '.' || s.back() == 'E' || s.back() == 'e')
+					throw std::runtime_error(std::to_string(line) + ": malformed number");
+				
+				s.push_back('\0');
+				if (dp || e) {
+					number n = std::strtod(&s[0], nullptr);
+					std::cout << n << std::endl;
+					symbols.emplace_back(tokens::NUMBER, std::string(&s[0]));
+				} else {
+					integer i = std::strtol(&s[0], nullptr, 10);
+					std::cout << i << std::endl;
+					symbols.emplace_back(tokens::INTEGER, std::string(&s[0]));
+				}			
 			} else {
 				throw std::runtime_error(std::to_string(line) + ": unexpected symbol");
 			}

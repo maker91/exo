@@ -13,8 +13,8 @@ namespace exo {
 			SEPARATOR,		// ,
 			ASSIGNMENT,		// =
 			
-			NUMBER,			// [-+]?[0-9]*.?[0-9]+[eE]?[0-9]+
-			INTEGER,		// [+-]?[0-9]+[eE]?[0-9]+
+			NUMBER,			// -?[0-9]*.?[0-9]+[eE]?[0-9]+
+			INTEGER,		// -?[0-9]+[eE]?[0-9]+
 			STRING,			// ".+"
 			CHAR,			// '.'
 			BOOLEAN,		// true/false
