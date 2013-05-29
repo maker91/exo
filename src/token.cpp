@@ -238,11 +238,9 @@ namespace exo {
 				s.push_back('\0');
 				if (dp || e) {
 					number n = std::strtod(&s[0], nullptr);
-					std::cout << n << std::endl;
 					symbols.emplace_back(tokens::NUMBER, std::string(&s[0]));
 				} else {
 					integer i = std::strtol(&s[0], nullptr, 10);
-					std::cout << i << std::endl;
 					symbols.emplace_back(tokens::INTEGER, std::string(&s[0]));
 				}			
 			} else {
