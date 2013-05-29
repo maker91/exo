@@ -82,6 +82,9 @@ namespace exo {
 			
 			LEN,		// R[A] = length(RK[B])
 			CONCAT,		// R[A] = RK[B] .. RK[C]
+			
+			SETGLOBAL,	// _G[RK[B]] = RK[C]
+			GETGLOBAL,	// R[A] = _G[RK[B]]
 		};
 	}	
 }

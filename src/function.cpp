@@ -166,6 +166,14 @@ namespace exo {
 			case opcodes::CONCAT:
 				SET_R(E, GET_A(I), GET_RKB(E, I).concat(GET_RKC(E, I)));
 				break;
+				
+			case opcodes::SETGLOBAL:
+				E->set_global(GET_RKB(E, I), GET_RKB(E, I));
+				break;
+				
+			case opcodes::GETGLOBAL:
+				SET_R(E, GET_A(I), E->get_global(GET_RKB(E, I)));
+				break;
 			}
 			
 			pc++;

@@ -10,7 +10,8 @@ namespace exo {
 	
 	// make this private
 	public:
-		exo::stack stack;
+		exo::stack 	stack;
+		exo::map	globals;
 		
 	public:
 		void push(const value &);
@@ -18,5 +19,8 @@ namespace exo {
 		
 		void set(int, const value &);
 		value get(int);
+		
+		void set_global(const value &, const value &);
+		value get_global(const value &);
 	};
 }
