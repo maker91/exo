@@ -1,5 +1,8 @@
 #pragma once
 
+#include <vector>
+#include <map>
+
 #include "token.h"
 #include "function.h"
 
@@ -15,6 +18,7 @@ namespace exo {
 		
 		std::vector<instruction> 	I;
 		std::vector<value> 			K;
+		std::map<std::string, int>	L;
 	
 	public:
 		compiler(const std::vector<symbol> &);
@@ -23,7 +27,8 @@ namespace exo {
 	private:
 		void do_block();
 		void do_statement();
-		int do_expression();
+		int do_expression(int);
 		void do_global();
+		void do_local();
 	};
 }

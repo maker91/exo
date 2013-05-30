@@ -5,7 +5,7 @@
 
 int main() {
 	try {
-		std::vector<exo::symbol> symbols = exo::tokenise("global test = 10");
+		std::vector<exo::symbol> symbols = exo::tokenise("_1 = 10");
 		
 		for (auto &symbol : symbols) {
 			std::cout << "(" << symbol.tk << ") " << symbol.str << std::endl; 

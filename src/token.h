@@ -59,6 +59,7 @@ namespace exo {
 			BOR,			// |
 			XOR,			// @
 			
+			DECL,			// decl
 			IF, 			// if
 			ELSE,			// else
 			FOR,			// for
@@ -78,8 +79,8 @@ namespace exo {
 		unsigned int	line;
 		unsigned int	column;
 		
-		symbol(tokens::token t, const std::string &s, value k=value())
-			: tk(t), str(s), k(k), line(0), column(0) {}
+		symbol(tokens::token t, const std::string &s, unsigned int l, value k=value())
+			: tk(t), str(s), k(k), line(l), column(0) {}
 	};
 	
 	std::vector<symbol> tokenise(const std::string &);
