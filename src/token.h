@@ -1,5 +1,7 @@
 #pragma once
 
+#include "value.h"
+
 #include <vector>
 #include <string>
 
@@ -13,14 +15,12 @@ namespace exo {
 			SEPARATOR,		// ,
 			ASSIGNMENT,		// =
 			
-			NUMBER,			// -?[0-9]*.?[0-9]+[eE]?[0-9]+
-			INTEGER,		// -?[0-9]+[eE]?[0-9]+
-			STRING,			// ".+"
-			CHAR,			// '.'
-			BOOLEAN,		// true/false
-			FUNCTION,		// function
+			BOOLEAN,
+			CONSTANT,
 			
+			FUNCTION,		// function
 			RETURN,			// return
+			NAMESPACE,		// namespace
 			
 			LINDEX,			// [
 			RINDEX,			// ]
@@ -30,7 +30,7 @@ namespace exo {
 			RPAREN,			// )
 			
 			ACCESS,			// .
-			NAMESPACE,		// ::
+			RESOLUTION,		// ::
 			
 			ADD,			// +
 			SUB,			// -
@@ -72,11 +72,14 @@ namespace exo {
 	struct symbol {
 		tokens::token 	tk;
 		std::string		str;
+		
+		value			k;
+		
 		unsigned int	line;
 		unsigned int	column;
 		
-		symbol(tokens::token t, const std::string &s)
-			: tk(t), str(s), line(0), column(0) {}
+		symbol(tokens::token t, const std::string &s, value k=value())
+			: tk(t), str(s), k(k), line(0), column(0) {}
 	};
 	
 	std::vector<symbol> tokenise(const std::string &);

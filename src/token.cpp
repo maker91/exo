@@ -40,12 +40,16 @@ namespace exo {
 				
 				if (str == "global")
 					symbols.emplace_back(tokens::GLOBAL, str);
-				else if (str == "true" || str == "false")
-					symbols.emplace_back(tokens::BOOLEAN, str);
+				else if (str == "true")
+					symbols.emplace_back(tokens::BOOLEAN, str, true);
+				else if (str == "false")
+					symbols.emplace_back(tokens::BOOLEAN, str, false);
 				else if (str == "function")
 					symbols.emplace_back(tokens::FUNCTION, str);
 				else if (str == "return")
 					symbols.emplace_back(tokens::RETURN, str);
+				else if (str == "namespace")
+					symbols.emplace_back(tokens::NAMESPACE, str);
 				else if (str == "if")
 					symbols.emplace_back(tokens::IF, str);
 				else if (str == "else")
@@ -61,7 +65,7 @@ namespace exo {
 				else if (str == "continue")
 					symbols.emplace_back(tokens::CONTINUE, str);
 				else
-					symbols.emplace_back(tokens::IDENTIFIER, str);
+					symbols.emplace_back(tokens::IDENTIFIER, str, str);
 			} else if (*p == ',') {
 				symbols.emplace_back(tokens::SEPARATOR, ",");
 				++p;
@@ -102,10 +106,10 @@ namespace exo {
 				} else {
 					symbols.emplace_back(tokens::ACCESS, ".");
 				}
-			} else if (*p == ':') { // namespace?
+			} else if (*p == ':') { // resolution?
 				++p;
 				if (*p == ':') {
-					symbols.emplace_back(tokens::NAMESPACE, "::");
+					symbols.emplace_back(tokens::RESOLUTION, "::");
 					++p;
 				} else {
 					throw std::runtime_error(std::to_string(line) + ": unexpected symbol near ':'");
@@ -183,7 +187,7 @@ namespace exo {
 				++p;
 				
 				if (*p == '\'') {
-					symbols.emplace_back(tokens::CHAR, std::string("")+c);
+					symbols.emplace_back(tokens::CONSTANT, std::string("")+c, (byte)c);
 					++p;
 				} else {
 					throw std::runtime_error(std::to_string(line) + ": unfinished char");
@@ -203,7 +207,7 @@ namespace exo {
 				++p;
 				s.push_back('\0');
 				std::string str(std::begin(s), std::end(s));
-				symbols.emplace_back(tokens::STRING, str);
+				symbols.emplace_back(tokens::CONSTANT, str, str);
 			} else if (std::isdigit(*p)) {
 			donumber:
 				std::vector<char> s;
@@ -238,10 +242,10 @@ namespace exo {
 				s.push_back('\0');
 				if (dp || e) {
 					number n = std::strtod(&s[0], nullptr);
-					symbols.emplace_back(tokens::NUMBER, std::string(&s[0]));
+					symbols.emplace_back(tokens::CONSTANT, std::string(&s[0]), n);
 				} else {
 					integer i = std::strtol(&s[0], nullptr, 10);
-					symbols.emplace_back(tokens::INTEGER, std::string(&s[0]));
+					symbols.emplace_back(tokens::CONSTANT, std::string(&s[0]), i);
 				}			
 			} else {
 				throw std::runtime_error(std::to_string(line) + ": unexpected symbol");
