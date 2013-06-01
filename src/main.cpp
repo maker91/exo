@@ -6,7 +6,7 @@
 
 int main() {
 	try {
-		std::vector<exo::symbol> symbols = exo::tokenise("global::func(1, 2, 3, 4)");
+		std::vector<exo::symbol> symbols = exo::tokenise("group::test = 10\ngroup::test()");
 		
 		for (auto &symbol : symbols) {
 			std::cout << "(" << symbol.tk << ") " << symbol.str << std::endl; 

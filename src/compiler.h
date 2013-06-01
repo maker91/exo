@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <map>
+#include <stack>
 
 #include "token.h"
 #include "function.h"
@@ -19,6 +20,7 @@ namespace exo {
 		std::vector<instruction> 	I;
 		std::vector<value> 			K;
 		std::map<std::string, int>	L;
+		std::stack<std::string>		N;
 	
 	public:
 		compiler(const std::vector<symbol> &);
@@ -31,7 +33,8 @@ namespace exo {
 		void do_statement();
 		int do_expression(int);
 		void do_global();
-		void do_local();
+		void do_local(const std::string &);
 		void do_function(int, int);
+		std::string do_identifier();
 	};
 }

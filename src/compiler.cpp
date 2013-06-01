@@ -84,13 +84,12 @@ namespace exo {
 		}
 	}
 	
-	void compiler::do_local() {
-		if (p == end-1)
-			throw std::runtime_error(std::to_string(p->line) + ": expected symbol near '" + p->str + "'");
+	std::string compiler::do_identifier() {
+		consume(tokens::IDENTIFIER, "name");
+		return (p-1)->str;
+	}
 	
-		std::string name = p->str;
-		++p;
-		
+	void compiler::do_local(const std::string &name) {
 		switch (p->tk) {
 		case tokens::ASSIGNMENT:
 			{
@@ -107,11 +106,8 @@ namespace exo {
 			
 		case tokens::LPAREN:
 			{
-				std::string name = p->str;
 				if (L.count(name) != 1)
 					throw std::runtime_error(std::to_string(p->line) + ": " + name + " is not a variable!");
-					
-				++p;
 					
 				int r = L[name];
 				do_function(r, 0);
@@ -151,15 +147,23 @@ namespace exo {
 	
 	void compiler::do_statement() {
 		switch (p->tk) {
-		// global variable definition
+		// global variable access
 		case tokens::GLOBAL:
 			do_global();
 			break;
 		
-		// assignment, function call
+		// local variable access
 		case tokens::IDENTIFIER:
-			do_local();
-			break;
+			{
+				std::string l = do_identifier();
+				while (p != end && p->tk == tokens::RESOLUTION) {
+					consume(tokens::RESOLUTION, "::");
+					l += ("::" + do_identifier());
+				}
+				
+				do_local(l);
+				break;
+			}
 			
 		default:
 			throw std::runtime_error(std::to_string(p->line) + ": unexpected symbol '" + p->str + "'");
