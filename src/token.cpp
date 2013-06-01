@@ -46,6 +46,8 @@ namespace exo {
 					symbols.emplace_back(tokens::BOOLEAN, str, line, true);
 				else if (str == "false")
 					symbols.emplace_back(tokens::BOOLEAN, str, line, false);
+				else if (str == "nil")
+					symbols.emplace_back(tokens::NIL, str, line);
 				else if (str == "function")
 					symbols.emplace_back(tokens::FUNCTION, str, line);
 				else if (str == "return")

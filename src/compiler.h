@@ -25,10 +25,13 @@ namespace exo {
 		function compile();
 		
 	private:
+		void consume(tokens::token, const std::string &);
+	
 		void do_block();
 		void do_statement();
 		int do_expression(int);
 		void do_global();
 		void do_local();
+		void do_function(int, int);
 	};
 }

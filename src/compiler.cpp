@@ -13,6 +13,16 @@ namespace exo {
 		
 	}
 	
+	void compiler::consume(tokens::token t, const std::string &s) {
+		if (p == end-1)
+			throw std::runtime_error(std::to_string(p->line) + ": expected " + s + " near eof");
+	
+		if (p->tk != t)
+			throw std::runtime_error(std::to_string(p->line) + ": expected " + s + " near " + p->str);
+			
+		++p;
+	}
+	
 	int compiler::do_expression(int r) {
 		int k = 0;
 	
@@ -22,13 +32,16 @@ namespace exo {
 			k = K.size()-1;
 
 			I.push_back(MAKE_ABC(opcodes::LOADK, r, 1, k, 0, 0));
-			
 			++p;
 			break;
 			
 		case tokens::BOOLEAN:
 			I.push_back(MAKE_ABC(opcodes::LOADBOOL, r, 0, p->k.to_boolean() ? 1 : 0, 0, 0));
+			++p;
+			break;
 			
+		case tokens::NIL:
+			I.push_back(MAKE_ABC(opcodes::LOADNIL, r, 0, 0, 0, 0));
 			++p;
 			break;
 		
@@ -40,49 +53,100 @@ namespace exo {
 	}
 
 	void compiler::do_global() {
-		if (p == end-1)
-			throw std::runtime_error(std::to_string(p->line) + ": expected symbol near 'global'");
-			
-		++p;
+		consume(tokens::GLOBAL, "global");
+		consume(tokens::RESOLUTION, "::");
+		consume(tokens::IDENTIFIER, "name");
 		
-		if (p->tk == tokens::FUNCTION) {
-			// do parameters
-			// do block
-			throw std::runtime_error("global function definition not implemented");
-		} else if (p->tk == tokens::IDENTIFIER) {
-			value key = p->k;
-			K.push_back(key);
-			int k = K.size()-1;
-			++p;
-			
-			if (p->tk == tokens::ASSIGNMENT) {
+		value key = (p-1)->k;
+		K.push_back(key);
+		int k = K.size()-1;
+		
+		switch (p->tk) {
+		case tokens::ASSIGNMENT:
+			{
 				++p;
 				
 				int r = do_expression(next_register++);
 				I.push_back(MAKE_ABC(opcodes::SETGLOBAL, 0, 1, k, 0, r));
-			} else {
-				throw std::runtime_error(std::to_string((p-1)->line) + ": global variables must be initialised");
+				break;
 			}
-		} else {
-			throw std::runtime_error(std::to_string(p->line) + ": unexpected symbol '" + p->str + "' near 'global'");
+			
+		case tokens::LPAREN:
+			{
+				int r = next_register++;
+				I.push_back(MAKE_ABC(opcodes::GETGLOBAL, r, 1, k, 0, 0));
+				do_function(r, 0);
+				break;
+			}
+			
+		default:
+			throw std::runtime_error(std::to_string((p-1)->line) + ": global variables must be initialised");
 		}
 	}
 	
 	void compiler::do_local() {
+		if (p == end-1)
+			throw std::runtime_error(std::to_string(p->line) + ": expected symbol near '" + p->str + "'");
+	
 		std::string name = p->str;
 		++p;
 		
-		if (p->tk == tokens::ASSIGNMENT) {
-			++p;
-			int l = next_register++;
-			L[name] = l;
+		switch (p->tk) {
+		case tokens::ASSIGNMENT:
+			{
+				++p;
+				int l = next_register++;
+				L[name] = l;
+				
+				int r = do_expression(l);
+				if (r!=l)
+					I.push_back(MAKE_ABC(opcodes::MOVE, r, 0, l, 0, 0));
+					
+				break;
+			}
 			
+		case tokens::LPAREN:
+			{
+				std::string name = p->str;
+				if (L.count(name) != 1)
+					throw std::runtime_error(std::to_string(p->line) + ": " + name + " is not a variable!");
+					
+				++p;
+					
+				int r = L[name];
+				do_function(r, 0);
+				break;
+			}
+		
+		default:
+			throw std::runtime_error(std::to_string((p-1)->line) + "unexpected symbol near '" + name + "'");
+		}
+	}
+	
+	void compiler::do_function(int f, int ret) {
+		consume(tokens::LPAREN, "(");
+		
+		int args = 0;
+		while (true) {
+			if (p == end)
+				throw std::runtime_error(std::to_string((p-1)->line) + ": expected ')' near eof");
+				
+			if (p->tk == tokens::RPAREN)
+				break;
+				
+			if (args > 0)
+				consume(tokens::SEPARATOR, ",");
+				
+			int l = next_register++;
 			int r = do_expression(l);
 			if (r!=l)
 				I.push_back(MAKE_ABC(opcodes::MOVE, r, 0, l, 0, 0));
-		} else {
-			throw std::runtime_error(std::to_string((p-1)->line) + ": use the decl keywod to declare uninitialised local variables");
+				
+			++args;
 		}
+		
+		++p;
+		I.push_back(MAKE_ABC(opcodes::CALL, (ret+1), 0, f, 0, (args+1)));
 	}
 	
 	void compiler::do_statement() {
@@ -94,17 +158,7 @@ namespace exo {
 		
 		// assignment, function call
 		case tokens::IDENTIFIER:
-			if (p == end-1)
-				throw std::runtime_error(std::to_string(p->line) + ": expected symbol near '" + p->str + "'");
-		
-			switch ((p+1)->tk) {
-			case tokens::ASSIGNMENT:
-				do_local();
-				break;
-				
-			default:
-				throw std::runtime_error(std::to_string(p->line) + ": unexpected symbol '" + p->str + "'");
-			}
+			do_local();
 			break;
 			
 		default:

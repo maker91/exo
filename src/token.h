@@ -17,6 +17,7 @@ namespace exo {
 			
 			BOOLEAN,
 			CONSTANT,
+			NIL,
 			
 			FUNCTION,		// function
 			RETURN,			// return
