@@ -6,7 +6,7 @@
 
 int main() {
 	try {
-		std::vector<exo::symbol> symbols = exo::tokenise("group::test = 10\ngroup::test()");
+		std::vector<exo::symbol> symbols = exo::tokenise("namespace exo {test = 10 namespace outer {test = 5 inner::test = 2.5}}");
 		
 		for (auto &symbol : symbols) {
 			std::cout << "(" << symbol.tk << ") " << symbol.str << std::endl; 

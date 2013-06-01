@@ -84,12 +84,23 @@ namespace exo {
 		}
 	}
 	
-	std::string compiler::do_identifier() {
+	std::string compiler::do_identifier(bool resolve) {
 		consume(tokens::IDENTIFIER, "name");
-		return (p-1)->str;
+		
+		std::string r = "";
+		
+		if (resolve) {
+			for (std::string &n : N)
+				r += (n + "::");
+		}
+			
+		r += (p-1)->str;			
+		return r;
 	}
 	
 	void compiler::do_local(const std::string &name) {
+		std::cout << "local variable assignment: " << name << std::endl;
+	
 		switch (p->tk) {
 		case tokens::ASSIGNMENT:
 			{
@@ -155,15 +166,30 @@ namespace exo {
 		// local variable access
 		case tokens::IDENTIFIER:
 			{
-				std::string l = do_identifier();
+				std::string l = do_identifier(true);
 				while (p != end && p->tk == tokens::RESOLUTION) {
 					consume(tokens::RESOLUTION, "::");
-					l += ("::" + do_identifier());
+					l += ("::" + do_identifier(false));
 				}
 				
 				do_local(l);
 				break;
 			}
+			
+		case tokens::NAMESPACE:
+			++p;
+			N.push_back(do_identifier(false));
+			consume(tokens::LBRACE, "{");
+			break;
+			
+		case tokens::RBRACE:
+			++p;
+			
+			if (N.empty())
+				throw std::runtime_error(std::to_string(p->line) + ": unexpected '}' near '" + (p-1)->str + "'");
+				
+			N.pop_back();
+			break;
 			
 		default:
 			throw std::runtime_error(std::to_string(p->line) + ": unexpected symbol '" + p->str + "'");
@@ -174,6 +200,9 @@ namespace exo {
 		while (p != end) {
 			do_statement();
 		}
+		
+		if (!N.empty())
+			throw std::runtime_error("expected '}' to close namespace '" + N.back() + " near eof");
 		
 		std::cout << "K: " << std::endl;
 		for (value &v : K) {
