@@ -32,8 +32,12 @@ namespace exo {
 		void do_statement();
 		int do_expression(int);
 		void do_global();
-		void do_local(const std::string &);
+		void do_local();
 		void do_function(int, int);
-		std::string do_identifier(bool);
+		
+		std::string do_name(bool);
+		std::string do_identifier();
+		
+		int get_local(const std::string &);
 	};
 }

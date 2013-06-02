@@ -1,5 +1,6 @@
 namespace exo {
-
 	test = "Hello World"
-	test()
+	global::print(test)
 }
+
+global::print(exo::test)

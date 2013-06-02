@@ -23,6 +23,13 @@ namespace exo {
 		++p;
 	}
 	
+	int compiler::get_local(const std::string &name) {
+		if (L.count(name) != 1)
+			throw std::runtime_error(std::to_string(p->line) + ": " + name + " is not a variable!");
+					
+		return L[name];
+	}
+	
 	int compiler::do_expression(int r) {
 		int k = 0;
 	
@@ -43,6 +50,10 @@ namespace exo {
 		case tokens::NIL:
 			I.push_back(MAKE_ABC(opcodes::LOADNIL, r, 0, 0, 0, 0));
 			++p;
+			break;
+			
+		case tokens::IDENTIFIER:
+			r = get_local(do_name(true));
 			break;
 		
 		default:
@@ -80,25 +91,37 @@ namespace exo {
 			}
 			
 		default:
-			throw std::runtime_error(std::to_string((p-1)->line) + ": global variables must be initialised");
+			throw std::runtime_error(std::to_string((p-1)->line) + ": unexpected symbol '" + p->str + "' near '" + (p-1)->str + "'");
 		}
 	}
 	
-	std::string compiler::do_identifier(bool resolve) {
+	std::string compiler::do_identifier() {
 		consume(tokens::IDENTIFIER, "name");
-		
+		return (p-1)->str;
+	}
+	
+	std::string compiler::do_name(bool resolve) {
 		std::string r = "";
 		
 		if (resolve) {
 			for (std::string &n : N)
 				r += (n + "::");
 		}
-			
-		r += (p-1)->str;			
+		
+		r += do_identifier();
+		while (p != end && p->tk == tokens::RESOLUTION) {
+			consume(tokens::RESOLUTION, "::");
+			r += ("::" + do_identifier());
+		}
+		
+		std::cout << "name: " << r << std::endl;
+		
 		return r;
 	}
 	
-	void compiler::do_local(const std::string &name) {
+	void compiler::do_local() {
+		std::string name = do_name(true);
+	
 		switch (p->tk) {
 		case tokens::ASSIGNMENT:
 			{
@@ -114,14 +137,8 @@ namespace exo {
 			}
 			
 		case tokens::LPAREN:
-			{
-				if (L.count(name) != 1)
-					throw std::runtime_error(std::to_string(p->line) + ": " + name + " is not a variable!");
-					
-				int r = L[name];
-				do_function(r, 0);
-				break;
-			}
+			do_function(get_local(name), 0);
+			break;
 		
 		default:
 			throw std::runtime_error(std::to_string((p-1)->line) + "unexpected symbol near '" + name + "'");
@@ -163,20 +180,12 @@ namespace exo {
 		
 		// local variable access
 		case tokens::IDENTIFIER:
-			{
-				std::string l = do_identifier(true);
-				while (p != end && p->tk == tokens::RESOLUTION) {
-					consume(tokens::RESOLUTION, "::");
-					l += ("::" + do_identifier(false));
-				}
-				
-				do_local(l);
-				break;
-			}
+			do_local();
+			break;
 			
 		case tokens::NAMESPACE:
 			++p;
-			N.push_back(do_identifier(false));
+			N.push_back(do_identifier());
 			consume(tokens::LBRACE, "{");
 			break;
 			
@@ -201,6 +210,8 @@ namespace exo {
 		
 		if (!N.empty())
 			throw std::runtime_error("expected '}' to close namespace '" + N.back() + " near eof");
+			
+		I.push_back(MAKE_ABC(opcodes::RTN, 1, 0, 0, 0, 0));
 		
 		std::cout << "K: " << std::endl;
 		for (value &v : K) {
