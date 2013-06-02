@@ -75,14 +75,19 @@ namespace exo {
 		tokens::token 	tk;
 		std::string		str;
 		
-		value			k;
+		int				k;
 		
 		unsigned int	line;
 		unsigned int	column;
 		
-		symbol(tokens::token t, const std::string &s, unsigned int l, value k=value())
+		symbol(tokens::token t, const std::string &s, unsigned int l, int k=-1)
 			: tk(t), str(s), k(k), line(l), column(0) {}
 	};
 	
-	std::vector<symbol> tokenise(const std::string &);
+	struct token_result {
+		std::vector<symbol> symbols;
+		std::vector<value>	constants;
+	};
+	
+	token_result tokenise(const std::string &);
 }

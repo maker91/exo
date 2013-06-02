@@ -5,11 +5,15 @@
 #include <stdexcept>
 #include <cctype>
 #include <cstdlib>
+#include <map>
 
 namespace exo {
 
-	std::vector<symbol> tokenise(const std::string &src) {
+	token_result tokenise(const std::string &src) {
 		std::vector<symbol> symbols;
+		std::map<exo::value, int> K;
+		int k = 0;
+		
 		std::vector<char> src_v(std::begin(src), std::end(src));
 		char *end = &src_v[src_v.size()-1]+1;
 		
@@ -43,9 +47,9 @@ namespace exo {
 				else if (str == "decl")
 					symbols.emplace_back(tokens::DECL, str, line);
 				else if (str == "true")
-					symbols.emplace_back(tokens::BOOLEAN, str, line, true);
+					symbols.emplace_back(tokens::BOOLEAN, str, line);
 				else if (str == "false")
-					symbols.emplace_back(tokens::BOOLEAN, str, line, false);
+					symbols.emplace_back(tokens::BOOLEAN, str, line);
 				else if (str == "nil")
 					symbols.emplace_back(tokens::NIL, str, line);
 				else if (str == "function")
@@ -68,8 +72,13 @@ namespace exo {
 					symbols.emplace_back(tokens::BREAK, str, line);
 				else if (str == "continue")
 					symbols.emplace_back(tokens::CONTINUE, str, line);
-				else
-					symbols.emplace_back(tokens::IDENTIFIER, str, line, str);
+				else {
+					value v(str);
+					if (K.count(v) == 0)
+						K[v] = k++;
+						
+					symbols.emplace_back(tokens::IDENTIFIER, str, line, K[v]);
+				}
 			} else if (*p == ',') {
 				symbols.emplace_back(tokens::SEPARATOR, ",", line);
 				++p;
@@ -191,7 +200,11 @@ namespace exo {
 				++p;
 				
 				if (*p == '\'') {
-					symbols.emplace_back(tokens::CONSTANT, std::string("")+c, line, (byte)c);
+					value v((byte)c);
+					if (K.count(v) == 0)
+						K[v] = k++;
+						
+					symbols.emplace_back(tokens::CONSTANT, std::string("")+c, line, K[v]);
 					++p;
 				} else {
 					throw std::runtime_error(std::to_string(line) + ": unfinished char");
@@ -211,7 +224,12 @@ namespace exo {
 				++p;
 				s.push_back('\0');
 				std::string str(std::begin(s), std::end(s));
-				symbols.emplace_back(tokens::CONSTANT, str, line, str);
+				
+				value v(str);
+				if (K.count(v) == 0)
+					K[v] = k++;
+					
+				symbols.emplace_back(tokens::CONSTANT, str, line, K[v]);
 			} else if (std::isdigit(*p)) {
 			donumber:
 				std::vector<char> s;
@@ -246,16 +264,32 @@ namespace exo {
 				s.push_back('\0');
 				if (dp || e) {
 					number n = std::strtod(&s[0], nullptr);
-					symbols.emplace_back(tokens::CONSTANT, std::string(&s[0]), line, n);
+					
+					value v(n);
+					if (K.count(v) == 0)
+						K[v] = k++;
+					symbols.emplace_back(tokens::CONSTANT, std::string(&s[0]), line, K[v]);
 				} else {
 					integer i = std::strtol(&s[0], nullptr, 10);
-					symbols.emplace_back(tokens::CONSTANT, std::string(&s[0]), line, i);
+					
+					value v(i);
+					if (K.count(v) == 0)
+						K[v] = k++;
+					symbols.emplace_back(tokens::CONSTANT, std::string(&s[0]), line, K[v]);
 				}			
 			} else {
 				throw std::runtime_error(std::to_string(line) + ": unexpected symbol");
 			}
 		}
 		
-		return symbols;
+		std::vector<value> constants(K.size());
+		for (auto &p : K) {
+			constants[p.second] = p.first;
+		}
+		
+		token_result res;
+		res.symbols = symbols;
+		res.constants = constants;
+		return res;
 	}
 }

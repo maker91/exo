@@ -7,8 +7,9 @@
 
 namespace exo {
 	
-	compiler::compiler(const std::vector<symbol> &src) 
-		: p(&src[0]), end(&src[src.size()-1]+1), next_register(0), next_constant(0)
+	compiler::compiler(const token_result &src) 
+		: p(&src.symbols[0]), end(&src.symbols[src.symbols.size()-1]+1), next_register(0),
+		K(src.constants)
 	{
 		
 	}
@@ -30,20 +31,21 @@ namespace exo {
 		return L[name];
 	}
 	
-	int compiler::do_expression(int r) {
-		int k = 0;
+	int compiler::get_global(int k, int r) {
+		I.push_back(MAKE_ABC(opcodes::GETGLOBAL, r, 1, k, 0, 0));
+		
+		return r;
+	}
 	
+	int compiler::do_expression(int r) {
 		switch (p->tk) {
 		case tokens::CONSTANT:
-			K.push_back(p->k);
-			k = K.size()-1;
-
-			I.push_back(MAKE_ABC(opcodes::LOADK, r, 1, k, 0, 0));
+			I.push_back(MAKE_ABC(opcodes::LOADK, r, 1, p->k, 0, 0));
 			++p;
 			break;
 			
 		case tokens::BOOLEAN:
-			I.push_back(MAKE_ABC(opcodes::LOADBOOL, r, 0, p->k.to_boolean() ? 1 : 0, 0, 0));
+			I.push_back(MAKE_ABC(opcodes::LOADBOOL, r, 0, p->str == "true" ? 1 : 0, 0, 0));
 			++p;
 			break;
 			
@@ -54,6 +56,14 @@ namespace exo {
 			
 		case tokens::IDENTIFIER:
 			r = get_local(do_name(true));
+			break;
+			
+		case tokens::GLOBAL:
+			consume(tokens::GLOBAL, "global");
+			consume(tokens::RESOLUTION, "::");
+			consume(tokens::IDENTIFIER, "name");
+			
+			r = get_global((p-1)->k, r);
 			break;
 		
 		default:
@@ -68,9 +78,7 @@ namespace exo {
 		consume(tokens::RESOLUTION, "::");
 		consume(tokens::IDENTIFIER, "name");
 		
-		value key = (p-1)->k;
-		K.push_back(key);
-		int k = K.size()-1;
+		int k = (p-1)->k;
 		
 		switch (p->tk) {
 		case tokens::ASSIGNMENT:
@@ -84,8 +92,7 @@ namespace exo {
 			
 		case tokens::LPAREN:
 			{
-				int r = next_register++;
-				I.push_back(MAKE_ABC(opcodes::GETGLOBAL, r, 1, k, 0, 0));
+				int r = get_global(k, next_register++);
 				do_function(r, 0);
 				break;
 			}
@@ -113,8 +120,6 @@ namespace exo {
 			consume(tokens::RESOLUTION, "::");
 			r += ("::" + do_identifier());
 		}
-		
-		std::cout << "name: " << r << std::endl;
 		
 		return r;
 	}
@@ -212,13 +217,6 @@ namespace exo {
 			throw std::runtime_error("expected '}' to close namespace '" + N.back() + " near eof");
 			
 		I.push_back(MAKE_ABC(opcodes::RTN, 1, 0, 0, 0, 0));
-		
-		std::cout << "K: " << std::endl;
-		for (value &v : K) {
-			std::cout << type_name(v.get_type()) << ": " << v.to_string() << std::endl;
-		}
-		
-		std::cout << std::endl;
 		
 		std::cout << "I: " << std::endl;
 		for (instruction i : I) {

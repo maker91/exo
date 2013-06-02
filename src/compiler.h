@@ -14,7 +14,6 @@ namespace exo {
 		const symbol *end;
 		
 		int next_register;
-		int next_constant;
 		
 		std::vector<instruction> 	I;
 		std::vector<value> 			K;
@@ -22,7 +21,7 @@ namespace exo {
 		std::vector<std::string>	N;
 	
 	public:
-		compiler(const std::vector<symbol> &);
+		compiler(const token_result &);
 		function compile();
 		
 	private:
@@ -39,5 +38,6 @@ namespace exo {
 		std::string do_identifier();
 		
 		int get_local(const std::string &);
+		int get_global(int, int);
 	};
 }

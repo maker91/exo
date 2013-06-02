@@ -25,14 +25,23 @@ int main(int argc, char **argv) {
 		std::string src((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
 	
 		// tokenise source
-		std::vector<exo::symbol> symbols = exo::tokenise(src);
-		for (auto &symbol : symbols) {
+		exo::token_result res = exo::tokenise(src);
+		
+		// print symbols
+		for (auto &symbol : res.symbols) {
 			std::cout << "(" << symbol.tk << ") " << symbol.str << std::endl; 
 		}
 		std::cout << std::endl;
 		
+		// print constants
+		std::cout << "K: " << std::endl;
+		for (exo::value &v : res.constants) {
+			std::cout << exo::type_name(v.get_type()) << ": " << v.to_string() << std::endl;
+		}
+		std::cout << std::endl;
+		
 		// compile tokens
-		exo::compiler c(symbols);
+		exo::compiler c(res);
 		exo::function func = c.compile();
 		std::cout << std::endl;
 		

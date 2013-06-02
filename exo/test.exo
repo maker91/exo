@@ -1,6 +1,11 @@
-namespace exo {
-	test = "Hello World"
-	global::print(test)
+namespace mike {
+	namespace is {
+		a::faggot::test = "lol"
+		
+		namespace a {
+			namespace faggot {
+				global::print(test)
+			}
+		}
+	}
 }
-
-global::print(exo::test)
