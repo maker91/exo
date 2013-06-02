@@ -99,8 +99,6 @@ namespace exo {
 	}
 	
 	void compiler::do_local(const std::string &name) {
-		std::cout << "local variable assignment: " << name << std::endl;
-	
 		switch (p->tk) {
 		case tokens::ASSIGNMENT:
 			{

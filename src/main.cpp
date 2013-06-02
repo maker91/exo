@@ -1,13 +1,22 @@
 #include <iostream>
+#include <string>
+#include <fstream>
 
 #include "token.h"
 #include "compiler.h"
 #include "state.h"
 
-int main() {
+int main(int argc, char **argv) {
+	if (argc < 2) {
+		std::cout << "usage: exo file" << std::endl;
+		return 0;
+	}
+
 	try {
-		std::vector<exo::symbol> symbols = exo::tokenise("namespace exo {test = 10 namespace outer {test = 5 inner::test = 2.5}}");
-		
+		std::ifstream ifs(argv[1]);
+		std::string src((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
+	
+		std::vector<exo::symbol> symbols = exo::tokenise(src);
 		for (auto &symbol : symbols) {
 			std::cout << "(" << symbol.tk << ") " << symbol.str << std::endl; 
 		}
