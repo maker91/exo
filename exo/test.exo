@@ -1,3 +1,2 @@
-test = "Hello World"
-
-global::print(test)
+global::_i = "yo"
+global::print(global::_i)

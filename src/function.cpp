@@ -76,7 +76,7 @@ namespace exo {
 				return GET_A(I)-1;
 				
 			case opcodes::CALL:
-				GET_RB(E, I).call(E, GET_B(I)-1, GET_C(I)-1);
+				GET_RB(E, I).call(E, GET_C(I)-1, GET_A(I)-1);
 				break;
 				
 			case opcodes::EQL:
@@ -168,7 +168,7 @@ namespace exo {
 				break;
 				
 			case opcodes::SETGLOBAL:
-				E->set_global(GET_RKB(E, I), GET_RKB(E, I));
+				E->set_global(GET_RKB(E, I), GET_RKC(E, I));
 				break;
 				
 			case opcodes::GETGLOBAL:

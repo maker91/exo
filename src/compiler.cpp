@@ -72,7 +72,29 @@ namespace exo {
 		
 		return r;
 	}
-
+	
+	std::string compiler::do_identifier() {
+		consume(tokens::IDENTIFIER, "name");
+		return (p-1)->str;
+	}
+	
+	std::string compiler::do_name(bool resolve) {
+		std::string r = "";
+		
+		if (resolve) {
+			for (std::string &n : N)
+				r += (n + "::");
+		}
+		
+		r += do_identifier();
+		while (p != end && p->tk == tokens::RESOLUTION) {
+			consume(tokens::RESOLUTION, "::");
+			r += ("::" + do_identifier());
+		}
+		
+		return r;
+	}
+	
 	void compiler::do_global() {
 		consume(tokens::GLOBAL, "global");
 		consume(tokens::RESOLUTION, "::");
@@ -100,28 +122,6 @@ namespace exo {
 		default:
 			throw std::runtime_error(std::to_string((p-1)->line) + ": unexpected symbol '" + p->str + "' near '" + (p-1)->str + "'");
 		}
-	}
-	
-	std::string compiler::do_identifier() {
-		consume(tokens::IDENTIFIER, "name");
-		return (p-1)->str;
-	}
-	
-	std::string compiler::do_name(bool resolve) {
-		std::string r = "";
-		
-		if (resolve) {
-			for (std::string &n : N)
-				r += (n + "::");
-		}
-		
-		r += do_identifier();
-		while (p != end && p->tk == tokens::RESOLUTION) {
-			consume(tokens::RESOLUTION, "::");
-			r += ("::" + do_identifier());
-		}
-		
-		return r;
 	}
 	
 	void compiler::do_local() {

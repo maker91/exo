@@ -7,7 +7,7 @@
 #include "state.h"
 
 int print(exo::state *E) {
-	exo::value v = E->get(1);
+	exo::value v = E->get(0);
 	std::cout << v.to_string() << std::endl;
 	
 	return 0;
