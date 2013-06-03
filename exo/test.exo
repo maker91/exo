@@ -1,2 +1,2 @@
-__s = "hi"
+__s = 10
 global::print(__s)

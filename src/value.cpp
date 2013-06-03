@@ -363,18 +363,10 @@ namespace exo {
 	}
 	
 	bool value::operator<(const value &o) const {
-		switch (type) {
-		case STRING:
-			return u_string < o.u_string;
-			
-		case NUMBER:
-		case INTEGER:
-		case BYTE:
+		if (type != o.type || type != STRING)
 			return data < o.data;
 			
-		default:
-			throw invalid_comparison_error(type, o.type);
-		}	
+		return u_string < o.u_string;
 	}
 	
 	bool value::operator<=(const value &o) const {
