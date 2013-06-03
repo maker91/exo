@@ -131,8 +131,14 @@ namespace exo {
 		case tokens::ASSIGNMENT:
 			{
 				++p;
-				int l = next_register++;
-				L[name] = l;
+				
+				int l;
+				if (!L.count(name)) {
+					l = next_register++;
+					L[name] = l;
+				} else {
+					l = L[name];
+				}
 				
 				int r = do_expression(l);
 				if (r!=l)
@@ -201,6 +207,11 @@ namespace exo {
 				throw std::runtime_error(std::to_string(p->line) + ": unexpected '}' near '" + (p-1)->str + "'");
 				
 			N.pop_back();
+			break;
+			
+		case tokens::DECL:
+			++p;
+			L[do_name(true)] = next_register++;
 			break;
 			
 		default:

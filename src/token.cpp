@@ -10,8 +10,8 @@
 namespace exo {
 
 	token_result tokenise(const std::string &src) {
-		std::vector<symbol> symbols;
 		std::map<exo::value, int> K;
+		std::vector<symbol> symbols;
 		int k = 0;
 		
 		std::vector<char> src_v(std::begin(src), std::end(src));
@@ -74,7 +74,7 @@ namespace exo {
 					symbols.emplace_back(tokens::CONTINUE, str, line);
 				else {
 					value v(str);
-					if (K.count(v) == 0)
+					if (!K.count(v))
 						K[v] = k++;
 						
 					symbols.emplace_back(tokens::IDENTIFIER, str, line, K[v]);
@@ -201,7 +201,7 @@ namespace exo {
 				
 				if (*p == '\'') {
 					value v((byte)c);
-					if (K.count(v) == 0)
+					if (!K.count(v))
 						K[v] = k++;
 						
 					symbols.emplace_back(tokens::CONSTANT, std::string("")+c, line, K[v]);
@@ -226,7 +226,7 @@ namespace exo {
 				std::string str(std::begin(s), std::end(s));
 				
 				value v(str);
-				if (K.count(v) == 0)
+				if (!K.count(v))
 					K[v] = k++;
 					
 				symbols.emplace_back(tokens::CONSTANT, str, line, K[v]);
@@ -266,14 +266,14 @@ namespace exo {
 					number n = std::strtod(&s[0], nullptr);
 					
 					value v(n);
-					if (K.count(v) == 0)
+					if (!K.count(v))
 						K[v] = k++;
 					symbols.emplace_back(tokens::CONSTANT, std::string(&s[0]), line, K[v]);
 				} else {
 					integer i = std::strtol(&s[0], nullptr, 10);
 					
 					value v(i);
-					if (K.count(v) == 0)
+					if (!K.count(v))
 						K[v] = k++;
 					symbols.emplace_back(tokens::CONSTANT, std::string(&s[0]), line, K[v]);
 				}			

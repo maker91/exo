@@ -17,8 +17,8 @@ namespace exo {
 		
 		std::vector<instruction> 	I;
 		std::vector<value> 			K;
-		std::map<std::string, int>	L;
 		std::vector<std::string>	N;
+		std::map<std::string, int>	L;
 	
 	public:
 		compiler(const token_result &);
