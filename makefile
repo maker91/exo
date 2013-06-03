@@ -1,8 +1,26 @@
-release:
-	g++ -Wall -Wextra -pedantic -std=c++11 -Ofast -o"bin/exo" src/*.cpp
+CC			= g++
+CFLAGS		= -Wall -Wextra -pedantic -std=c++11 -g
+LDFLAGS		=
+SOURCES		= src/main.cpp src/compiler.cpp src/exception.cpp src/function.cpp src/stack.cpp src/state.cpp src/token.cpp src/value.cpp
+OBJECTS		= $(patsubst %.cpp, %.o, $(patsubst src/%, obj/%, ${SOURCES}))
+EXECUTABLE	= bin/exo
+
+all: $(EXECUTABLE)	
 	
-debug:
-	g++ -Wall -Wextra -pedantic -std=c++11 -g -o"bin/exo" src/*.cpp
+$(EXECUTABLE): bin obj $(OBJECTS)
+	@echo buiding $(EXECUTABLE)
+	@$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 	
-profile:
-	g++ -Wall -Wextra -pedantic -std=c++11 -g -pg -o"bin/exo" src/*.cpp
+obj/%.o : src/%.cpp
+	@echo compiling $<
+	@$(CC) $(CFLAGS) -c $< -o $@
+	
+obj:
+	mkdir obj
+	
+bin:
+	mkdir bin
+	
+clean:
+	@echo cleaning project
+	@rm -f $(OBJECTS)
