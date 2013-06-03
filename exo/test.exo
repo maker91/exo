@@ -1,2 +1,1 @@
-global::_i = "yo"
-global::print(global::_i)
+__s = "hi"

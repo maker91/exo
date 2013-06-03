@@ -32,7 +32,7 @@ namespace exo {
 				++p;
 				
 				while (!std::isspace(*p) && p!=end) {
-					if (!std::isalnum(*p))
+					if (!std::isalnum(*p) && *p != '_')
 						break;
 						
 					s.push_back(*p);
