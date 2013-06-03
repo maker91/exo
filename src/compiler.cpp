@@ -1,9 +1,10 @@
+#include <iostream>
+#include <stdexcept>
+
 #include "compiler.h"
 #include "type.h"
 #include "value.h"
 #include "opcode.h"
-
-#include <iostream>
 
 namespace exo {
 	

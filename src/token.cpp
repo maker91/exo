@@ -25,6 +25,9 @@ namespace exo {
 					
 				++p;
 			}
+			
+			if (*p == '\0')
+				break;
 		
 			if (*p == '_' || std::isalpha(*p)) { // keyword or identifier
 				std::vector<char> s;
@@ -278,7 +281,7 @@ namespace exo {
 					symbols.emplace_back(tokens::CONSTANT, std::string(&s[0]), line, K[v]);
 				}			
 			} else {
-				throw std::runtime_error(std::to_string(line) + ": unexpected symbol");
+				throw std::runtime_error(std::to_string(line) + ": unexpected symbol: " + std::to_string((int)*p));
 			}
 		}
 		
