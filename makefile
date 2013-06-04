@@ -17,11 +17,12 @@ obj/%.o : src/%.cpp
 	@$(CC) $(CFLAGS) -c $< -o $@
 	
 obj:
-	mkdir obj
+	@mkdir obj
 	
 bin:
-	mkdir bin
+	@mkdir bin
 	
 clean:
 	@echo "cleaning project"
-	@rm -f $(OBJECTS)
+	@rm -rf obj/
+	@echo "done!"
