@@ -1,2 +1,7 @@
-__s = 10
-global::print(__s)
+print = global::print
+print(1)
+print("Hello World!")
+print('a')
+print(true)
+print(print)
+print(nil)

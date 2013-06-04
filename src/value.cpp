@@ -298,16 +298,27 @@ namespace exo {
 			return std::to_string(u_int);
 			
 		case BYTE:
-			return std::to_string(u_byte);	
+			{
+				char s[2];
+				s[0] = u_byte;
+				s[1] = '\0';
+				return std::string(s);
+			}
 			
 		case BOOLEAN:
 			return u_bool ? "true" : "false";
 			
 		case LIST:
+			{
+				char c[20];
+				snprintf(c, 20, "list: 0x%p", (void *)u_map);
+				return std::string(c);
+			}
+		
 		case MAP:
 			{
 				char c[20];
-				snprintf(c, 20, "0x%p", (void *)u_map);
+				snprintf(c, 20, "map: 0x%p", (void *)u_map);
 				return std::string(c);
 			}
 			
