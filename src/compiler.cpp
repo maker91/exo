@@ -16,7 +16,7 @@ namespace exo {
 	}
 	
 	void compiler::consume(tokens::token t, const std::string &s) {
-		if (p == end-1)
+		if (p == end)
 			throw std::runtime_error(std::to_string(p->line) + ": expected " + s + " near eof");
 	
 		if (p->tk != t)
@@ -108,7 +108,10 @@ namespace exo {
 			{
 				++p;
 				
-				int r = do_expression(next_register++);
+				int r = do_expression(next_register);
+				if (r == next_register)
+					next_register++;
+				
 				I.push_back(MAKE_ABC(opcodes::SETGLOBAL, 0, 1, k, 0, r));
 				break;
 			}
@@ -215,6 +218,33 @@ namespace exo {
 			L[do_name(true)] = next_register++;
 			break;
 			
+		case tokens::WHILE:
+			{
+				++p;
+				consume(tokens::LPAREN, "(");
+				
+				int r = do_expression(next_register);
+				if (r == next_register)
+					next_register++;
+				
+				consume(tokens::RPAREN, ")");
+				consume(tokens::LBRACE, "{");
+				
+				I.push_back(MAKE_ABC(opcodes::NOOP, 0, 0, 0, 0, 0)); // gets replaced by TEST instruction after while loop has been parsed
+				unsigned start_i = I.size();
+				
+				while (p != end && p->tk != tokens::RBRACE)
+					do_statement();
+				
+				unsigned num_i = I.size() - start_i + 1;
+				std::cout << start_i << ", " << num_i << std::endl;
+				I.push_back(MAKE_ABx(opcodes::JMP, 0, 1, num_i));
+				I[start_i-1] = MAKE_AtBx(opcodes::TEST, r, 0, 0, (num_i+1));
+				
+				consume(tokens::RBRACE, "}");
+				break;
+			}
+			
 		default:
 			throw std::runtime_error(std::to_string(p->line) + ": unexpected symbol '" + p->str + "'");
 		}
@@ -232,7 +262,8 @@ namespace exo {
 		
 		std::cout << "I: " << std::endl;
 		for (instruction i : I) {
-			std::cout << GET_OP(i) << " " << GET_A(i) << " " << IS_BK(i) << " " << GET_B(i) << " " << IS_CK(i) << " " << GET_C(i) << std::endl;
+			std::cout << GET_OP(i) << "\t" << GET_A(i) << " " << IS_BK(i) << " " << GET_B(i) << " " << IS_CK(i) << " " << GET_C(i);
+			std::cout << "\t(" << GET_A(i) << " " << GET_T(i) << " " << (int)GET_Bx(i) << ")" << std::endl;
 		}
 		
 		return function(I, K);

@@ -25,7 +25,8 @@
 #define GET_OP(i) 	exo::opcodes::opcode((i>>26) & 0xFF)
 #define GET_A(i)	((i>>18) & 0xFF)
 #define GET_B(i)	((i>>9) & 0xFF)
-#define GET_Bx(i)	(((i>>16) & 0x01)==0x01 ? -(i & 0xFFFF) : (i & 0xFFFF))
+#define GET_uBx(i)	(i & 0xFFFF)
+#define GET_Bx(i)	(((i>>16) & 0x01)==0x01 ? -GET_uBx(i) : GET_uBx(i))
 #define GET_C(i)	(i & 0xFF)
 #define GET_T(i)	((i>>17) & 0x01)
 
