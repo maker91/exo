@@ -1,18 +1,19 @@
 CC			= g++
 CFLAGS		= -Wall -Wextra -pedantic -std=c++11 -g
-LDFLAGS		=
+LDFLAGS		= 
 SOURCES		= src/main.cpp src/compiler.cpp src/exception.cpp src/function.cpp src/stack.cpp src/state.cpp src/token.cpp src/value.cpp
 OBJECTS		= $(patsubst %.cpp, %.o, $(patsubst src/%, obj/%, ${SOURCES}))
 EXECUTABLE	= bin/exo
 
-all: $(EXECUTABLE)	
+all: $(EXECUTABLE)
+	@echo "done!"
 	
 $(EXECUTABLE): bin obj $(OBJECTS)
-	@echo buiding $(EXECUTABLE)
+	@echo "buiding $(EXECUTABLE)"
 	@$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 	
 obj/%.o : src/%.cpp
-	@echo compiling $<
+	@echo "compiling $<"
 	@$(CC) $(CFLAGS) -c $< -o $@
 	
 obj:
@@ -22,5 +23,5 @@ bin:
 	mkdir bin
 	
 clean:
-	@echo cleaning project
+	@echo "cleaning project"
 	@rm -f $(OBJECTS)
