@@ -49,7 +49,7 @@ namespace exo {
 			LOADK,		// R[A] = K[B]
 			LOADBOOL,	// R[A] = Bool(B)
 			LOADNIL,	// R[A] = nil
-			MOVE,		// R[B] = R[A]
+			MOVE,		// R[A] = R[B]
 			
 			JMP,		// pc += Bx
 			TEST,		// if R[A] == Bool(T) then pc += Bx

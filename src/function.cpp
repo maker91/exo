@@ -69,7 +69,7 @@ namespace exo {
 				break;
 				
 			case opcodes::MOVE:
-				SET_R(E, GET_B(I), GET_RA(E, I));
+				SET_R(E, GET_A(I), GET_RB(E, I));
 				break;
 				
 			case opcodes::RTN:

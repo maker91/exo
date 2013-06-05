@@ -29,15 +29,16 @@ namespace exo {
 	
 		void do_block();
 		void do_statement();
-		int do_expression(int);
 		void do_global();
 		void do_local();
 		void do_function(int, int);
+		
+		void do_expression(int);
 		
 		std::string do_name(bool);
 		std::string do_identifier();
 		
 		int get_local(const std::string &);
-		int get_global(int, int);
+		void get_global(int, int);
 	};
 }

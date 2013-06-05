@@ -32,13 +32,11 @@ namespace exo {
 		return L[name];
 	}
 	
-	int compiler::get_global(int k, int r) {
+	void compiler::get_global(int k, int r) {
 		I.push_back(MAKE_ABC(opcodes::GETGLOBAL, r, 1, k, 0, 0));
-		
-		return r;
 	}
 	
-	int compiler::do_expression(int r) {
+	void compiler::do_expression(int r) {
 		switch (p->tk) {
 		case tokens::CONSTANT:
 			I.push_back(MAKE_ABC(opcodes::LOADK, r, 1, p->k, 0, 0));
@@ -56,22 +54,94 @@ namespace exo {
 			break;
 			
 		case tokens::IDENTIFIER:
-			r = get_local(do_name(true));
-			break;
+			{
+				int l = get_local(do_name(true));
+				
+				if (r != l)
+					I.push_back(MAKE_ABC(opcodes::MOVE, r, 0, l, 0, 0));
+				break;
+			}
 			
 		case tokens::GLOBAL:
 			consume(tokens::GLOBAL, "global");
 			consume(tokens::RESOLUTION, "::");
 			consume(tokens::IDENTIFIER, "name");
 			
-			r = get_global((p-1)->k, r);
+			get_global((p-1)->k, r);
 			break;
+			
+		case tokens::LPAREN:
+			{
+				++p;
+				
+				do_expression(r);	
+				consume(tokens::RPAREN, ")");
+				break;
+			}
 		
 		default:
 			throw std::runtime_error(std::to_string(p->line) + ": unexpected symbol '" + p->str + "'");
 		}
 		
-		return r;
+		int i;
+		switch (p->tk) {
+		case tokens::ADD:
+			++p;
+			
+			i = next_register++;
+			do_expression(i);
+			
+			I.push_back(MAKE_ABC(opcodes::ADD, r, 0, r, 0, i));
+			break;
+			
+		case tokens::SUB:
+			++p;
+			
+			i = next_register++;
+			do_expression(i);
+			
+			I.push_back(MAKE_ABC(opcodes::SUB, r, 0, r, 0, i));
+			break;
+			
+		case tokens::MUL:
+			++p;
+			
+			i = next_register++;
+			do_expression(i);
+			
+			I.push_back(MAKE_ABC(opcodes::MUL, r, 0, r, 0, i));
+			break;
+			
+		case tokens::DIV:
+			++p;
+			
+			i = next_register++;
+			do_expression(i);
+			
+			I.push_back(MAKE_ABC(opcodes::DIV, r, 0, r, 0, i));
+			break;
+			
+		case tokens::LT:
+			++p;
+			
+			i = next_register++;
+			do_expression(i);
+			
+			I.push_back(MAKE_ABC(opcodes::LT, r, 0, r, 0, i));
+			break;
+			
+		case tokens::LE:
+			++p;
+		
+			i = next_register++;
+			do_expression(i);
+			
+			I.push_back(MAKE_ABC(opcodes::LE, r, 0, r, 0, i));
+			break;
+			
+		default:
+			break;
+		}
 	}
 	
 	std::string compiler::do_identifier() {
@@ -108,17 +178,16 @@ namespace exo {
 			{
 				++p;
 				
-				int r = do_expression(next_register);
-				if (r == next_register)
-					next_register++;
-				
+				int r = next_register++;
+				do_expression(r);				
 				I.push_back(MAKE_ABC(opcodes::SETGLOBAL, 0, 1, k, 0, r));
 				break;
 			}
 			
 		case tokens::LPAREN:
 			{
-				int r = get_global(k, next_register++);
+				int r = next_register++;
+				get_global(k, r);
 				do_function(r, 0);
 				break;
 			}
@@ -144,9 +213,7 @@ namespace exo {
 					l = L[name];
 				}
 				
-				int r = do_expression(l);
-				if (r!=l)
-					I.push_back(MAKE_ABC(opcodes::MOVE, r, 0, l, 0, 0));
+				do_expression(l);
 					
 				break;
 			}
@@ -174,11 +241,8 @@ namespace exo {
 			if (args > 0)
 				consume(tokens::SEPARATOR, ",");
 				
-			int l = next_register++;
-			int r = do_expression(l);
-			if (r!=l)
-				I.push_back(MAKE_ABC(opcodes::MOVE, r, 0, l, 0, 0));
-				
+			int r = next_register++;
+			do_expression(r);				
 			++args;
 		}
 		
@@ -223,23 +287,21 @@ namespace exo {
 				++p;
 				consume(tokens::LPAREN, "(");
 				
-				int r = do_expression(next_register);
-				if (r == next_register)
-					next_register++;
+				unsigned start_exp = I.size();
+				int r = next_register++;
+				do_expression(r);
 				
 				consume(tokens::RPAREN, ")");
 				consume(tokens::LBRACE, "{");
 				
+				unsigned start_loop = I.size();
 				I.push_back(MAKE_ABC(opcodes::NOOP, 0, 0, 0, 0, 0)); // gets replaced by TEST instruction after while loop has been parsed
-				unsigned start_i = I.size();
 				
 				while (p != end && p->tk != tokens::RBRACE)
 					do_statement();
 				
-				unsigned num_i = I.size() - start_i + 1;
-				std::cout << start_i << ", " << num_i << std::endl;
-				I.push_back(MAKE_ABx(opcodes::JMP, 0, 1, num_i));
-				I[start_i-1] = MAKE_AtBx(opcodes::TEST, r, 0, 0, (num_i+1));
+				I.push_back(MAKE_ABx(opcodes::JMP, 0, 1, (I.size() - start_exp)));
+				I[start_loop] = MAKE_AtBx(opcodes::TEST, r, 0, 0, (I.size() - start_loop));
 				
 				consume(tokens::RBRACE, "}");
 				break;
