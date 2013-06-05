@@ -42,6 +42,9 @@ namespace exo {
 		while (true) {	
 			exo::instruction I = *pc;
 			exo::opcodes::opcode OP = GET_OP(I);
+			
+			//std::cout << std::endl;
+			//std::cout << GET_OP(I) << std::endl;
 		
 			switch (OP) {
 			case opcodes::NOOP:
@@ -52,8 +55,9 @@ namespace exo {
 				break;
 				
 			case opcodes::TEST:
-				if (GET_RA(E, I).to_boolean() == (exo::boolean)GET_T(I))
+				if (GET_RA(E, I).to_boolean() == (exo::boolean)GET_T(I)) {
 					pc += (int)GET_Bx(I) - 1;
+				}
 				break;
 				
 			case opcodes::LOADK:
@@ -177,6 +181,8 @@ namespace exo {
 			}
 			
 			pc++;
+			
+			//E->stack.print_stack();
 		}
 	}
 }

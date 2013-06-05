@@ -20,6 +20,11 @@ namespace exo {
 			case BYTE:
 				ra = a;
 				rb = b.to_number();
+				break;	
+
+			case BOOLEAN:
+				ra = a.to_boolean();
+				rb = b;
 				break;
 			
 			case STRING:
@@ -47,7 +52,12 @@ namespace exo {
 			case BYTE:
 				ra = a;
 				rb = b.to_integer();
-				break;			
+				break;
+
+			case BOOLEAN:
+				ra = a.to_boolean();
+				rb = b;
+				break;	
 			
 			case STRING:
 				ra = a.to_number();
@@ -79,6 +89,11 @@ namespace exo {
 				ra = a;
 				rb = b;
 				break;
+				
+			case BOOLEAN:
+				ra = a.to_boolean();
+				rb = b;
+				break;
 			
 			case STRING:
 				ra = a.to_number();
@@ -94,6 +109,22 @@ namespace exo {
 			}
 			break;
 			
+		case BOOLEAN:
+			switch (b.get_type()) {
+				case NUMBER:
+				case INTEGER:
+				case BYTE:
+				case BOOLEAN:
+				case STRING:
+					ra = a.to_boolean();
+					rb = b.to_boolean();
+					break;
+					
+				default:
+					throw invalid_binop_error(BOOLEAN, b.get_type());
+			}
+			break;
+			
 		case STRING:
 			switch (b.get_type()) {
 			case NUMBER:				
@@ -105,6 +136,11 @@ namespace exo {
 					throw invalid_binop_error(STRING, b.get_type());
 				}
 				rb = b.to_number();
+				break;
+				
+			case BOOLEAN:
+				ra = a.to_boolean();
+				rb = b;
 				break;
 				
 			case STRING:
@@ -180,6 +216,10 @@ namespace exo {
 	
 	type value::get_type() const {
 		return type;
+	}
+	
+	std::size_t value::get_data() const {
+		return data;
 	}
 	
 	number value::to_number() const {
@@ -374,10 +414,29 @@ namespace exo {
 	}
 	
 	bool value::operator<(const value &o) const {
-		if (type != o.type || type != STRING)
-			return data < o.data;
+		value ra, rb;
+		try {
+			promote(*this, o, ra, rb);
+		} catch (invalid_binop_error &err) {
+			throw std::runtime_error(std::string("attempt to compare ") + type_name(type) + " and " + type_name(o.type));
+		}
+	
+		switch (ra.type) {
+		case NUMBER:
+			return ra.u_num < rb.u_num;
+		
+		case INTEGER:
+			return ra.u_int < rb.u_int;
+		
+		case BYTE:
+			return ra.u_byte < rb.u_byte;
+		
+		case STRING:
+			return ra.u_string < rb.u_string;
 			
-		return u_string < o.u_string;
+		default:
+			return false;
+		}
 	}
 	
 	bool value::operator<=(const value &o) const {

@@ -2,20 +2,20 @@
 
 #include <cstdint>
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <string>
 
 namespace exo {
 	class value;
 	class state;
 
-	typedef double					number;
-	typedef std::int32_t 			integer;
-	typedef std::int8_t				byte;
-	typedef bool					boolean;
-	typedef std::string				string;
-	typedef std::vector<value> 		list;
-	typedef std::map<value, value> 	map;
+	typedef double								number;
+	typedef std::int32_t 						integer;
+	typedef std::int8_t							byte;
+	typedef bool								boolean;
+	typedef std::string							string;
+	typedef std::vector<value> 					list;
+	typedef std::unordered_map<value, value> 	map;
 	
 	typedef int (*nfunction)(state *);
 	

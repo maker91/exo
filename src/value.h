@@ -43,6 +43,7 @@ namespace exo {
 		~value();
 		
 		exo::type get_type() const;
+		std::size_t get_data() const;
 		
 		number 	to_number() const;
 		integer to_integer() const;
@@ -51,10 +52,6 @@ namespace exo {
 		string 	to_string() const;
 		
 		int call(state *, int, int);
-		
-		bool operator==(const value &o) const;
-		bool operator<(const value &o) const;
-		bool operator<=(const value &o) const;
 		
 		value get(const value &) const;
 		void set(const value &, const value &);
@@ -72,6 +69,10 @@ namespace exo {
 		value operator|(const value &) const;
 		value operator^(const value &) const;
 		value operator~() const;
+		
+		bool operator==(const value &) const;
+		bool operator<(const value &) const;
+		bool operator<=(const value &) const;
 	};
 	
 	
@@ -79,4 +80,18 @@ namespace exo {
 		binary operand promotion
 	*/
 	void promote(const value &a, const value &b, value &ra, value &rb);
+}
+
+/*
+	value hash specialization
+*/
+namespace std {
+	template <> struct hash<exo::value> {
+		size_t operator()(const exo::value &o) const {
+			if (o.get_type() == exo::STRING)
+				return hash<std::string>()(o.to_string());
+			else
+				return hash<size_t>()((size_t(o.get_type())<<((sizeof(size_t)-1)*8)) | o.get_data());
+		}
+	};
 }

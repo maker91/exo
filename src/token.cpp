@@ -5,12 +5,12 @@
 #include <stdexcept>
 #include <cctype>
 #include <cstdlib>
-#include <map>
+#include <unordered_map>
 
 namespace exo {
 
 	token_result tokenise(const std::string &src) {
-		std::map<exo::value, int> K;
+		std::unordered_map<exo::value, int> K;
 		std::vector<symbol> symbols;
 		int k = 0;
 		
