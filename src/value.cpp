@@ -6,6 +6,7 @@
 #include <iostream>
 #include <cstdio>
 #include <cmath>
+#include <stdexcept>
 
 namespace exo {
 	/*
