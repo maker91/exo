@@ -181,16 +181,16 @@ namespace exo {
 	}
 		
 	value::value(number n)
-		: type(NUMBER), u_num(n) {}
+		: type(NUMBER), data((size_t)n) {}
 		
 	value::value(integer i)
-		: type(INTEGER), u_int(i) {}
+		: type(INTEGER), data((size_t)i) {}
 		
 	value::value(byte b)
-		: type(BYTE), u_byte(b) {}
+		: type(BYTE), data((size_t)b) {}
 		
 	value::value(boolean b)
-		: type(BOOLEAN), u_bool(b) {}
+		: type(BOOLEAN), data((size_t)b) {}
 		
 	value::value(string s)
 		: type(STRING), u_string(s) {}
@@ -199,16 +199,16 @@ namespace exo {
 		: value(string(s)) {}
 		
 	value::value(list *l)
-		: type(LIST), u_list(l) {}
+		: type(LIST), data((size_t)l) {}
 		
 	value::value(map *m)
-		: type(MAP), u_map(m) {}
+		: type(MAP), data((size_t)m) {}
 		
 	value::value(function *f)
-		: type(FUNCTION), u_func(f) {}
+		: type(FUNCTION), data((size_t)f) {}
 		
 	value::value(nfunction f)
-		: type(NFUNCTION), u_nfunc(f) {}
+		: type(NFUNCTION), data((size_t)f) {}
 		
 	value::~value() {
 		// delete map, list or function if it is the last reference?
@@ -440,7 +440,7 @@ namespace exo {
 	}
 	
 	bool value::operator<=(const value &o) const {
-		return (*this < o)||(*this == o);
+		return ((*this < o)||(*this == o));
 	}
 	
 	value value::get(const value &o) const {

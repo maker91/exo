@@ -43,8 +43,9 @@ namespace exo {
 			exo::instruction I = *pc;
 			exo::opcodes::opcode OP = GET_OP(I);
 			
-			//std::cout << std::endl;
-			//std::cout << GET_OP(I) << std::endl;
+			std::cout << std::endl;
+			std::cout << pc << ": " << opcode_name(OP) << "\t" << GET_A(I) << " " << IS_BK(I) << " " << GET_B(I) << " " << IS_CK(I) << " " << GET_C(I);
+			std::cout << "\t(" << GET_A(I) << " " << GET_T(I) << " " << (int)GET_Bx(I) << ")" << std::endl;
 		
 			switch (OP) {
 			case opcodes::NOOP:
@@ -178,11 +179,15 @@ namespace exo {
 			case opcodes::GETGLOBAL:
 				SET_R(E, GET_A(I), E->get_global(GET_RKB(E, I)));
 				break;
+				
+			default:
+				break;
 			}
 			
 			pc++;
 			
-			//E->stack.print_stack();
+			E->stack.print_stack();
+			system("pause");
 		}
 	}
 }

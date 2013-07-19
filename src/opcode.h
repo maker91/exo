@@ -42,7 +42,6 @@ namespace exo {
 	typedef std::uint32_t instruction;
 
 	namespace opcodes {
-		
 		enum opcode {
 			NOOP,		// Do nothing
 			
@@ -86,6 +85,49 @@ namespace exo {
 			
 			SETGLOBAL,	// _G[RK[B]] = RK[C]
 			GETGLOBAL,	// R[A] = _G[RK[B]]
+			
+			COUNT		// opcode count
 		};
 	}	
+	
+	inline string opcode_name(opcodes::opcode o) {
+		switch (o) {
+			case opcodes::NOOP:			return "NOOP";
+			case opcodes::LOADK:		return "LOADK";
+			case opcodes::LOADBOOL:		return "LOADBOOL";
+			case opcodes::LOADNIL:		return "LOADNIL";
+			case opcodes::MOVE:			return "MOVE";
+			case opcodes::JMP:			return "JMP";
+			case opcodes::TEST:			return "TEST";
+			case opcodes::RTN:			return "RTN";
+			case opcodes::CALL:			return "CALL";
+			case opcodes::EQL:			return "EQL";
+			case opcodes::LT:			return "LT";
+			case opcodes::LE:			return "LE";
+			case opcodes::AND:			return "AND";
+			case opcodes::OR:			return "OR";
+			case opcodes::NOT:			return "NOT";
+			case opcodes::BAND:			return "BAND";
+			case opcodes::BOR:			return "BOR";
+			case opcodes::BXOR:			return "BXOR";
+			case opcodes::BNOT:			return "BNOT";
+			case opcodes::ADD:			return "ADD";
+			case opcodes::SUB:			return "SUB";
+			case opcodes::MUL:			return "MUL";
+			case opcodes::DIV:			return "DIV";
+			case opcodes::POW:			return "POW";
+			case opcodes::MOD:			return "MOD";
+			case opcodes::NEWLIST:		return "NEWLIST";
+			case opcodes::NEWMAP:		return "NEWMAP";
+			case opcodes::SET:			return "SET";
+			case opcodes::GET:			return "GET";
+			case opcodes::LEN:			return "LEN";
+			case opcodes::CONCAT:		return "CONCAT";
+			case opcodes::SETGLOBAL:	return "SETGLOB";
+			case opcodes::GETGLOBAL:	return "GETGLOB";
+			
+			case opcodes::COUNT:
+			default:					return "INVALID";
+		}
+	}
 }

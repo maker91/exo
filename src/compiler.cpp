@@ -214,7 +214,6 @@ namespace exo {
 				}
 				
 				do_expression(l);
-					
 				break;
 			}
 			
@@ -300,6 +299,7 @@ namespace exo {
 				while (p != end && p->tk != tokens::RBRACE)
 					do_statement();
 				
+				I.push_back(MAKE_ABC());
 				I.push_back(MAKE_ABx(opcodes::JMP, 0, 1, (I.size() - start_exp)));
 				I[start_loop] = MAKE_AtBx(opcodes::TEST, r, 0, 0, (I.size() - start_loop));
 				
@@ -324,7 +324,9 @@ namespace exo {
 		
 		std::cout << "I: " << std::endl;
 		for (instruction i : I) {
-			std::cout << GET_OP(i) << "\t" << GET_A(i) << " " << IS_BK(i) << " " << GET_B(i) << " " << IS_CK(i) << " " << GET_C(i);
+			opcodes::opcode op = GET_OP(i);
+			
+			std::cout << opcode_name(op) << "\t" << GET_A(i) << " " << IS_BK(i) << " " << GET_B(i) << " " << IS_CK(i) << " " << GET_C(i);
 			std::cout << "\t(" << GET_A(i) << " " << GET_T(i) << " " << (int)GET_Bx(i) << ")" << std::endl;
 		}
 		

@@ -1,7 +1,8 @@
 print = global::print
 
 a = 1
-while (a <= 10) {
+b = 10
+while (a <= b) {
 	print(a)
 	a = a + 1
 }
