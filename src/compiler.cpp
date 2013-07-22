@@ -299,7 +299,6 @@ namespace exo {
 				while (p != end && p->tk != tokens::RBRACE)
 					do_statement();
 				
-				I.push_back(MAKE_ABC());
 				I.push_back(MAKE_ABx(opcodes::JMP, 0, 1, (I.size() - start_exp)));
 				I[start_loop] = MAKE_AtBx(opcodes::TEST, r, 0, 0, (I.size() - start_loop));
 				
