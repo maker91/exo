@@ -187,7 +187,7 @@ namespace exo {
 			pc++;
 			
 			E->stack.print_stack();
-			system("pause");
+			//system("pause");
 		}
 	}
 }
