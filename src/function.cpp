@@ -61,20 +61,12 @@ namespace exo {
 				}
 				break;
 				
-			case opcodes::LOADK:
-				SET_R(E, GET_A(I), GET_KB(I));
-				break;
-				
-			case opcodes::LOADBOOL:
-				SET_R(E, GET_A(I), (exo::boolean)GET_B(I));
-				break;
-				
-			case opcodes::LOADNIL:
-				SET_R(E, GET_A(I), value());
-				break;
-				
 			case opcodes::MOVE:
-				SET_R(E, GET_A(I), GET_RB(E, I));
+				SET_R(E, GET_A(I), GET_RKB(E, I));
+				break;
+
+			case opcodes::PUSH:
+				E->push(GET_RKB(E, I));
 				break;
 				
 			case opcodes::RTN:

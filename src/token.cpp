@@ -12,7 +12,11 @@ namespace exo {
 	token_result tokenise(const std::string &src) {
 		std::unordered_map<exo::value, int> K;
 		std::vector<symbol> symbols;
-		int k = 0;
+
+		K[exo::value()] = 0;
+		K[exo::value(true)] = 1;
+		K[exo::value(false)] = 2;
+		int k = 3;
 		
 		std::vector<char> src_v(std::begin(src), std::end(src));
 		char *end = &src_v[src_v.size()-1]+1;

@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
 		
 		// print symbols
 		for (auto &symbol : res.symbols) {
-			std::cout << "(" << symbol.tk << ") " << symbol.str << std::endl; 
+			std::cout << "(" << symbol.tk << ") " << symbol.str << " [" << symbol.k << "]" << std::endl; 
 		}
 		std::cout << std::endl;
 		

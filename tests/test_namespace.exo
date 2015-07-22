@@ -1,0 +1,14 @@
+print = print
+
+namespace test1 {
+	foo = "foo1"
+	namespace test2 {
+		foo = "foo2"
+	}
+	
+	print(foo)
+}
+
+print(test1::foo)
+print(test1::test2::foo)
+

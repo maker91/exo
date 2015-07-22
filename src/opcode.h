@@ -45,10 +45,8 @@ namespace exo {
 		enum opcode {
 			NOOP,		// Do nothing
 			
-			LOADK,		// R[A] = K[B]
-			LOADBOOL,	// R[A] = Bool(B)
-			LOADNIL,	// R[A] = nil
-			MOVE,		// R[A] = R[B]
+			MOVE,		// R[A] = RK[B]
+			PUSH,		// R[top] = RK[B]
 			
 			JMP,		// pc += Bx
 			TEST,		// if R[A] == Bool(T) then pc += Bx
@@ -93,10 +91,8 @@ namespace exo {
 	inline string opcode_name(opcodes::opcode o) {
 		switch (o) {
 			case opcodes::NOOP:			return "NOOP";
-			case opcodes::LOADK:		return "LOADK";
-			case opcodes::LOADBOOL:		return "LOADBOOL";
-			case opcodes::LOADNIL:		return "LOADNIL";
 			case opcodes::MOVE:			return "MOVE";
+			case opcodes::PUSH:			return "PUSH";
 			case opcodes::JMP:			return "JMP";
 			case opcodes::TEST:			return "TEST";
 			case opcodes::RTN:			return "RTN";

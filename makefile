@@ -1,5 +1,5 @@
 CC			= g++
-CFLAGS		= -Wall -Wextra -pedantic -std=c++11 -g
+CFLAGS		= -stdlib=libc++ -std=c++11 -Wall -Wextra -pedantic -g
 LDFLAGS		= 
 SOURCES		= src/main.cpp src/compiler.cpp src/exception.cpp src/function.cpp src/stack.cpp src/state.cpp src/token.cpp src/value.cpp
 OBJECTS		= $(patsubst %.cpp, %.o, $(patsubst src/%, obj/%, ${SOURCES}))

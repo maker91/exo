@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stack>
+
 #include "stack.h"
 #include "value.h"
 
@@ -22,5 +24,8 @@ namespace exo {
 		
 		void set_global(const value &, const value &);
 		value get_global(const value &);
+
+		void push_scope(int i);
+		void pop_scope();
 	};
 }
