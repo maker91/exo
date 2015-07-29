@@ -38,6 +38,7 @@ namespace exo {
 	
 	int function::call(state *E) {
 		exo::instruction *pc = &i_store[0];
+		exo::value one = exo::value(1);
 		
 		while (true) {	
 			exo::instruction I = *pc;
@@ -138,6 +139,14 @@ namespace exo {
 				
 			case opcodes::MOD: 
 				SET_R(E, GET_A(I), GET_RKB(E, I) % GET_RKC(E, I));
+				break;
+
+			case opcodes::INCR:
+				SET_R(E, GET_A(I), GET_RA(E, I) + one);
+				break;
+
+			case opcodes::DECR:
+				SET_R(E, GET_A(I), GET_RA(E, I) - one);
 				break;
 				
 			case opcodes::NEWLIST:

@@ -1,0 +1,13 @@
+print("out")
+
+function test(a, b) {
+    print(a .. " " .. b)
+}
+
+test2 = function() {
+    print("in3")
+}
+
+test("in", "1")
+test("in", "2")
+test2()

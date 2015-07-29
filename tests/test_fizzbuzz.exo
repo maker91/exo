@@ -1,0 +1,14 @@
+for (a=1, 10000000) {
+    m3 = (a%3) == 0
+    m5 = (a%5) == 0
+
+    if (m3 && m5)
+	print("FizzBuzz")
+    else if (m3)
+	print("Fizz")
+    else if (m5)
+	print("Buzz")
+    else
+	print(a)
+}
+

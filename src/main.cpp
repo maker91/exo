@@ -33,16 +33,17 @@ int main(int argc, char **argv) {
 		}
 		std::cout << std::endl;
 		
+		// compile tokens
+		std::vector<exo::symbol>::iterator start = std::begin(res.symbols);
+		exo::compiler c(res.constants, start, std::end(res.symbols));
+		exo::function *func = c.compile();
+		std::cout << std::endl;
+
 		// print constants
 		std::cout << "K: " << std::endl;
 		for (exo::value &v : res.constants) {
 			std::cout << exo::type_name(v.get_type()) << ": " << v.to_string() << std::endl;
 		}
-		std::cout << std::endl;
-		
-		// compile tokens
-		exo::compiler c(res);
-		exo::function func = c.compile();
 		std::cout << std::endl;
 		
 		// create state and register print function
@@ -51,7 +52,7 @@ int main(int argc, char **argv) {
 		
 		// run script
 		std::cout << "output: " << std::endl;
-		func.call(&E);
+		func->call(&E);
 	} catch (std::exception &e) {
 		std::cout << "error: " << e.what() << std::endl;
 	}

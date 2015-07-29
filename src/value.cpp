@@ -117,7 +117,7 @@ namespace exo {
 				case BYTE:
 				case BOOLEAN:
 				case STRING:
-					ra = a.to_boolean();
+					ra = a;
 					rb = b.to_boolean();
 					break;
 					
@@ -222,6 +222,13 @@ namespace exo {
 	std::size_t value::get_data() const {
 		return data;
 	}
+
+	std::size_t value::hash() const {
+		if (type == exo::STRING)
+			return std::hash<std::string>()(u_string);
+		else
+			return std::hash<size_t>()((size_t(type)<<((sizeof(size_t)-1)*8)) | data);
+	}
 	
 	number value::to_number() const {
 		switch (type) {
@@ -311,16 +318,24 @@ namespace exo {
 	}
 	
 	boolean value::to_boolean() const {
-		switch (type) {
-		case NUMBER:		
-		case INTEGER:					
-		case BYTE:		
+		switch (type) {		
 		case LIST:
 		case MAP:
 		case NFUNCTION:
 		case FUNCTION:
-		case STRING:
 			return true;
+
+		case STRING:
+			return !u_string.empty();
+
+		case NUMBER:
+			return u_num != 0.0;
+
+		case INTEGER:
+			return u_int != 0;
+
+		case BYTE:
+			return u_byte != 0;
 			
 		case BOOLEAN:
 			return u_bool;

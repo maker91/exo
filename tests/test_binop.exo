@@ -1,0 +1,12 @@
+a = true
+b = true
+
+if (a || b)
+    print("a or b")
+
+if (a && b)
+    print("a and b")
+
+
+print(1 + 2)
+print(1 + 2 + 3 - 6)

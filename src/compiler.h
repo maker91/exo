@@ -27,28 +27,37 @@ namespace exo {
 
 	class compiler {
 	private:
-		const symbol *p;
-		const symbol *end;
+		std::vector<symbol>::iterator &p;
+		std::vector<symbol>::iterator end;
 		
 		int next_register;
 		
 		namespace_info *N; //current namespace
 		std::vector<instruction> I;
-		std::vector<value> 			K;
+		std::vector<value> &K;
 	
 	public:
-		compiler(const token_result &);
-		function compile();
+		compiler(std::vector<value> &constants, std::vector<symbol>::iterator &start, std::vector<symbol>::iterator end);
+		compiler(std::vector<value> &constants, std::vector<symbol>::iterator &start, 
+			std::vector<symbol>::iterator end, std::vector<std::string> params);
+		function *compile();
 		
 	private:
 		void consume(tokens::token, const std::string &);
 	
 		void do_block();
 		void do_statement();
-		void do_local();
-		void do_function(int, int);
-		
-		void do_expression(int r, bool push = false);
+		void do_variable_assignment();
+		void do_function_call(int, int);
+		void do_while();
+		void do_if();
+		void do_for();
+		void do_expression(int r);
+		void do_sub_expression(int r, int i);
+		void do_function();
+		void do_function(int r);
+		void do_return();
+		int do_param_list(tokens::token, const std::string &);
 		
 		std::string do_identifier();
 		

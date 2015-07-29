@@ -44,6 +44,7 @@ namespace exo {
 		
 		exo::type get_type() const;
 		std::size_t get_data() const;
+		std::size_t hash() const;
 		
 		number 	to_number() const;
 		integer to_integer() const;
@@ -88,10 +89,7 @@ namespace exo {
 namespace std {
 	template <> struct hash<exo::value> {
 		size_t operator()(const exo::value &o) const {
-			if (o.get_type() == exo::STRING)
-				return hash<std::string>()(o.to_string());
-			else
-				return hash<size_t>()((size_t(o.get_type())<<((sizeof(size_t)-1)*8)) | o.get_data());
+			return o.hash();
 		}
 	};
 }

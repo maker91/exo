@@ -1,7 +1,6 @@
-a = 1
-while (true) {
-    print(a)
-    if (a >= 10)
-	return
-    a = a + 1
+function plus_one(a) {
+    return a+1
 }
+
+for i=1, 10
+    print(plus_one(i))

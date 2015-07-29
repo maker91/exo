@@ -1,22 +1,20 @@
 #include "token.h"
 #include "type.h"
+#include "value.h"
 
 #include <iostream>
 #include <stdexcept>
 #include <cctype>
 #include <cstdlib>
+#include <string>
 #include <unordered_map>
 
 namespace exo {
 
 	token_result tokenise(const std::string &src) {
-		std::unordered_map<exo::value, int> K;
+		std::vector<exo::value> K = {exo::value(), exo::value(true), exo::value(false)};
 		std::vector<symbol> symbols;
-
-		K[exo::value()] = 0;
-		K[exo::value(true)] = 1;
-		K[exo::value(false)] = 2;
-		int k = 3;
+		symbols.emplace_back(tokens::LBRACE, "{", 0);
 		
 		std::vector<char> src_v(std::begin(src), std::end(src));
 		char *end = &src_v[src_v.size()-1]+1;
@@ -81,10 +79,14 @@ namespace exo {
 					symbols.emplace_back(tokens::CONTINUE, str, line);
 				else {
 					value v(str);
-					if (!K.count(v))
-						K[v] = k++;
-						
-					symbols.emplace_back(tokens::IDENTIFIER, str, line, K[v]);
+					auto loc = std::find(K.begin(), K.end(), v);
+					if (loc == K.end()) {
+						K.push_back(v);
+						loc = K.end() - 1;
+					}
+					auto pos = std::distance(K.begin(), loc);
+
+					symbols.emplace_back(tokens::IDENTIFIER, str, line, pos);
 				}
 			} else if (*p == ',') {
 				symbols.emplace_back(tokens::SEPARATOR, ",", line);
@@ -208,35 +210,38 @@ namespace exo {
 				
 				if (*p == '\'') {
 					value v((byte)c);
-					if (!K.count(v))
-						K[v] = k++;
+					auto loc = std::find(K.begin(), K.end(), v);
+					if (loc == K.end()) {
+						K.push_back(v);
+						loc = K.end() - 1;
+					}
+					auto pos = std::distance(K.begin(), loc);
 						
-					symbols.emplace_back(tokens::CONSTANT, std::string("")+c, line, K[v]);
+					symbols.emplace_back(tokens::CONSTANT, std::string("")+c, line, pos);
 					++p;
 				} else {
 					throw std::runtime_error(std::to_string(line) + ": unfinished char");
 				}
 			} else if (*p == '"') {
-				++p;
+				char *start = ++p;
+				size_t len = 0;
 				
-				std::vector<char> s;
-				while (*p != '"') {
+				for (; *p != '"'; ++p, ++len)
 					if (*p == '\n' || p == end)
 						throw std::runtime_error(std::to_string(line) + ": unfinished string");
-						
-					s.push_back(*p);
-					++p;
-				}
 				
 				++p;
-				s.push_back('\0');
-				std::string str(std::begin(s), std::end(s));
+				std::string str(start, len);
 				
 				value v(str);
-				if (!K.count(v))
-					K[v] = k++;
-					
-				symbols.emplace_back(tokens::CONSTANT, str, line, K[v]);
+				auto loc = std::find(K.begin(), K.end(), v);
+				if (loc == K.end()) {
+					K.push_back(v);
+					loc = K.end() - 1;
+				}
+				auto pos = std::distance(K.begin(), loc);
+
+				symbols.emplace_back(tokens::CONSTANT, str, line, pos);
 			} else if (std::isdigit(*p)) {
 			donumber:
 				std::vector<char> s;
@@ -273,30 +278,37 @@ namespace exo {
 					number n = std::strtod(&s[0], nullptr);
 					
 					value v(n);
-					if (!K.count(v))
-						K[v] = k++;
-					symbols.emplace_back(tokens::CONSTANT, std::string(&s[0]), line, K[v]);
+					auto loc = std::find(K.begin(), K.end(), v);
+					if (loc == K.end()) {
+						K.push_back(v);
+						loc = K.end() - 1;
+					}
+					auto pos = std::distance(K.begin(), loc);
+
+					symbols.emplace_back(tokens::CONSTANT, std::string(&s[0]), line, pos);
 				} else {
 					integer i = std::strtol(&s[0], nullptr, 10);
 					
 					value v(i);
-					if (!K.count(v))
-						K[v] = k++;
-					symbols.emplace_back(tokens::CONSTANT, std::string(&s[0]), line, K[v]);
+					auto loc = std::find(K.begin(), K.end(), v);
+					if (loc == K.end()) {
+						K.push_back(v);
+						loc = K.end() - 1;
+					}
+					auto pos = std::distance(K.begin(), loc);
+
+					symbols.emplace_back(tokens::CONSTANT, std::string(&s[0]), line, pos);
 				}			
 			} else {
 				throw std::runtime_error(std::to_string(line) + ": unexpected symbol: " + std::to_string((int)*p));
 			}
 		}
-		
-		std::vector<value> constants(K.size());
-		for (auto &p : K) {
-			constants[p.second] = p.first;
-		}
-		
+
+		symbols.emplace_back(tokens::RBRACE, "}", line+1);
+				
 		token_result res;
 		res.symbols = symbols;
-		res.constants = constants;
+		res.constants = K;
 		return res;
 	}
 }

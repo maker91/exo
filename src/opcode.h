@@ -72,6 +72,9 @@ namespace exo {
 			DIV,		// R[A] = RK[B] + RK[C]
 			POW,		// R[A] = RK[B] ^ RK[C]
 			MOD,		// R[A] = RK[B] % RK[C]
+
+			INCR,		// R[A] = R[A] + 1
+			DECR,		// R[A] = R[A] - 1
 			
 			NEWLIST,	// R[A] = list
 			NEWMAP,		// R[A] = map
@@ -113,6 +116,8 @@ namespace exo {
 			case opcodes::DIV:			return "DIV";
 			case opcodes::POW:			return "POW";
 			case opcodes::MOD:			return "MOD";
+			case opcodes::INCR:			return "INCR";
+			case opcodes::DECR:			return "DECR";
 			case opcodes::NEWLIST:		return "NEWLIST";
 			case opcodes::NEWMAP:		return "NEWMAP";
 			case opcodes::SET:			return "SET";
