@@ -57,8 +57,9 @@ namespace exo {
         consume(tokens::RBRACE, "}");
 	}
 
-	void compiler::do_expression(int r) {
+	int compiler::do_expression() {
 		opcodes::opcode op = opcodes::MOVE;
+		int r = next_register++;
 
 		switch (p->tk) {
 		case tokens::CONSTANT:
@@ -84,7 +85,7 @@ namespace exo {
 				
 				if (l == -1) { // no local variable, add a GETGLOBAL instruction
 					I.push_back(MAKE_ABC(opcodes::GETGLOBAL, r, 1, (p-1)->k, 0, 0));
-				} else if (r != l) {
+				} else {
 					I.push_back(MAKE_ABC(op, r, 0, l, 0, 0));
 				}
 			}
@@ -96,13 +97,15 @@ namespace exo {
 			
 		case tokens::LPAREN:
 			consume(tokens::LPAREN, "(");
-			do_expression(r);	
+			next_register--;
+			do_expression();	
 			consume(tokens::RPAREN, ")");
 			break;
 
 		case tokens::NOT:
 			++p;
-			do_expression(r);
+			next_register--;
+			do_expression();
 			I.push_back(MAKE_ABC(opcodes::NOT, r, 0, r, 0, 0));
 			break;
 		
@@ -110,86 +113,89 @@ namespace exo {
 			throw std::runtime_error(std::to_string(p->line) + ": unexpected symbol '" + p->str + "'");
 		}
 		
-		do_sub_expression(r, r+1);
+		do_sub_expression(r);
+		next_register = r+1;
+		return r;
 	}
 
-	void compiler::do_sub_expression(int r, int i) {
+	void compiler::do_sub_expression(int r) {
+		int i;
 		switch (p->tk) {
 		case tokens::ADD:
 			++p;
-			do_expression(i);
+			i = do_expression();
 			I.push_back(MAKE_ABC(opcodes::ADD, r, 0, r, 0, i));
 			break;
 			
 		case tokens::SUB:
 			++p;
-			do_expression(i);
+			i = do_expression();
 			I.push_back(MAKE_ABC(opcodes::SUB, r, 0, r, 0, i));
 			break;
 			
 		case tokens::MUL:
 			++p;
-			do_expression(i);
+			i = do_expression();
 			I.push_back(MAKE_ABC(opcodes::MUL, r, 0, r, 0, i));
 			break;
 			
 		case tokens::DIV:
 			++p;
-			do_expression(i);			
+			i = do_expression();			
 			I.push_back(MAKE_ABC(opcodes::DIV, r, 0, r, 0, i));
 			break;
 
 		case tokens::MOD:
 			++p;
-			do_expression(i);			
+			i = do_expression();			
 			I.push_back(MAKE_ABC(opcodes::MOD, r, 0, r, 0, i));
 			break;
 			
 		case tokens::LT:
 			++p;
-			do_expression(i);
+			i = do_expression();
 			I.push_back(MAKE_ABC(opcodes::LT, r, 0, r, 0, i));
 			break;
 			
 		case tokens::LE:
 			++p;
-			do_expression(i);
+			i = do_expression();
 			I.push_back(MAKE_ABC(opcodes::LE, r, 0, r, 0, i));
 			break;
 
 		case tokens::GT:
 			++p;
-			do_expression(i);
+			i = do_expression();
 			I.push_back(MAKE_ABC(opcodes::LT, r, 0, i, 0, r));
 			break;
 			
 		case tokens::GE:
 			++p;
-			do_expression(i);
+			i = do_expression();
 			I.push_back(MAKE_ABC(opcodes::LE, r, 0, i, 0, r));
 			break;
 
 		case tokens::AND:
 			++p;
-			do_expression(i);
+			i = do_expression();
 			I.push_back(MAKE_ABC(opcodes::AND, r, 0, i, 0, r));
 			break;
 
 		case tokens::OR:
 			++p;
-			do_expression(i);
+			i = do_expression();
 			I.push_back(MAKE_ABC(opcodes::OR, r, 0, i, 0, r));
 			break;
 
 		case tokens::EQUAL:
 			++p;
-			do_expression(i);
+			i = do_expression();
 			I.push_back(MAKE_ABC(opcodes::EQL, r, 0, r, 0, i));
 			break;
 
 		case tokens::CONCAT:
 			++p;
-			do_expression(i);
+			i = do_expression();
 			I.push_back(MAKE_ABC(opcodes::CONCAT, r, 0, r, 0, i));
 			break;
 
@@ -201,7 +207,7 @@ namespace exo {
 			return;
 		}
 
-		do_sub_expression(r, i+1);
+		do_sub_expression(r);
 	}
 	
 	std::string compiler::do_identifier() {
@@ -232,17 +238,18 @@ namespace exo {
 		consume(tokens::ASSIGNMENT, "=");
 		
 		if (!root->L.count(name)) {
-			int l = next_register++;
-			do_expression(l);
+			int l = do_expression();
 			root->L[name] = l;
 		} else {
 			int l = root->L[name];
-			do_expression(l);
+			int n = do_expression();
+			I.push_back(MAKE_ABC(opcodes::MOVE, l, 0, n, 0, 0));
 		}
 	}
 
 	int compiler::do_param_list(tokens::token end_tk, const std::string &end_str) {
 		int args = 0;
+		std::vector<int> params;
 		while (true) {
 			if (p == end)
 				throw std::runtime_error(std::to_string((p-1)->line) + ": expected '" + end_str + "' near eof");
@@ -253,12 +260,13 @@ namespace exo {
 			if (args > 0)
 				consume(tokens::SEPARATOR, ",");
 			
-			int l = next_register;
-			do_expression(l);
-			I.push_back(MAKE_ABC(opcodes::PUSH, 0, 0, l, 0, 0));
-			next_register = l;
+			int l = do_expression();
+			params.push_back(l);
 			++args;
 		}
+
+		for (int param : params)
+			I.push_back(MAKE_ABC(opcodes::PUSH, 0, 0, param, 0, 0));
 
 		return args;
 	}
@@ -275,9 +283,7 @@ namespace exo {
 		
 		unsigned start_exp = I.size();
 
-		int r = next_register;
-		do_expression(r);
-		next_register = r;
+		int r = do_expression();
 		
 		unsigned start_loop = I.size();
 		I.push_back(MAKE_ABC(opcodes::NOOP, 0, 0, 0, 0, 0)); // gets replaced by TEST instruction after while loop has been parsed
@@ -290,9 +296,7 @@ namespace exo {
 
 	void compiler::do_if() {
 		++p;
-		int r = next_register;
-		do_expression(next_register);
-		next_register = r;
+		int r = do_expression();
 		unsigned start_if = I.size();
 		I.push_back(MAKE_ABC(opcodes::NOOP, 0, 0, 0, 0, 0)); // gets replaced by TEST instruction after if statement has been parsed
 		do_statement();
@@ -325,17 +329,16 @@ namespace exo {
 
 		int l;
 		if (!root->L.count(name)) {
-			l = next_register++;
+			l = do_expression();
 			root->L[name] = l;
 		} else {
 			l = root->L[name];
+			int n = do_expression();
+			I.push_back(MAKE_ABC(opcodes::MOVE, l, 0, n, 0, 0));
 		}
 
-		do_expression(l);  // the initial value
-
 		consume(tokens::SEPARATOR, ",");
-		int r = next_register++;
-		do_expression(r); // the limit
+		int r = do_expression(); // the limit
 
 		if (parens)
 			consume(tokens::RPAREN, ")");
@@ -351,8 +354,6 @@ namespace exo {
 		I.push_back(MAKE_ABC(opcodes::INCR, l, 0, 0, 0, 0)); // increment the counter
 		I.push_back(MAKE_ABx(opcodes::JMP, 0, 1, (I.size() - start_for))); // jump back to the beginning of the loop
 		I[start_loop] = MAKE_AtBx(opcodes::TEST, p, 0, 0, (I.size() - start_loop));
-
-		next_register = r;
 	}
 
 	void compiler::do_return() {
@@ -372,9 +373,7 @@ namespace exo {
 			if ((p+1)->tk == tokens::ASSIGNMENT) {
 				do_variable_assignment();
 			} else {
-				int r = next_register++;
-				do_expression(r);
-				next_register = r;
+				do_expression();
 			}
 			break;
 
@@ -417,11 +416,27 @@ namespace exo {
 
 		default:
 			{
-				int r = next_register++;
-				do_expression(r);
-				next_register = r;
+				do_expression();
 			}
 		}
+	}
+
+	std::vector<std::string> compiler::do_identifier_list(tokens::token end_tk, const std::string &end_str) {
+		std::vector<std::string> params;
+		while (true) {
+			if (p == end)
+				throw std::runtime_error(std::to_string((p-1)->line) + ": expected " + end_str + " near eof");
+				
+			if (p->tk == end_tk)
+				break;
+				
+			if (!params.empty())
+				consume(tokens::SEPARATOR, ",");
+			
+			params.push_back(do_identifier());
+		}
+
+		return params;
 	}
 
 	void compiler::do_function() {
@@ -438,19 +453,7 @@ namespace exo {
 		}
 
 		consume(tokens::LPAREN, "(");
-		std::vector<std::string> params;
-		while (true) {
-			if (p == end)
-				throw std::runtime_error(std::to_string((p-1)->line) + ": expected ')' near eof");
-				
-			if (p->tk == tokens::RPAREN)
-				break;
-				
-			if (!params.empty())
-				consume(tokens::SEPARATOR, ",");
-			
-			params.push_back(do_identifier());
-		}
+		auto params = do_identifier_list(tokens::RPAREN, ")");
 		consume(tokens::RPAREN, ")");
 		consume(tokens::LBRACE, "{");
 
