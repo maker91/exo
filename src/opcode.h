@@ -45,8 +45,8 @@ namespace exo {
 		enum opcode {
 			NOOP,		// Do nothing
 			
-			MOVE,		// R[A] = RK[B]
-			PUSH,		// R[top] = RK[B]
+			MOVE,		// R[A] = RK[B - C]
+			PUSH,		// R[top] = RK[B - C]
 			
 			JMP,		// pc += Bx
 			TEST,		// if R[A] == Bool(T) then pc += Bx
@@ -65,6 +65,9 @@ namespace exo {
 			BOR,		// R[A] = RK[B] | RK[C]
 			BXOR,		// R[A] = RK[B] @ RK[C]
 			BNOT,		// R[A] = ~RK[B]
+
+			LSHIFT,		// R[A] = RK[B] << RK[C]
+			RSHIFT,		// R[A] = RK[B] << RK[C]
 			
 			ADD,		// R[A] = RK[B] + RK[C]
 			SUB,		// R[A] = RK[B] + RK[C]
@@ -72,11 +75,12 @@ namespace exo {
 			DIV,		// R[A] = RK[B] + RK[C]
 			POW,		// R[A] = RK[B] ^ RK[C]
 			MOD,		// R[A] = RK[B] % RK[C]
+			UNM,		// R[A] = -RK[B]
 
 			INCR,		// R[A] = R[A] + 1
 			DECR,		// R[A] = R[A] - 1
 			
-			NEWLIST,	// R[A] = list
+			NEWLIST,	// R[A] = list(R[top - B] .. R[top])
 			NEWMAP,		// R[A] = map
 			SET,		// R[A][RK[B]] = RK[C]
 			GET,		// R[A] = R[B][RK[C]]
@@ -110,12 +114,15 @@ namespace exo {
 			case opcodes::BOR:			return "BOR";
 			case opcodes::BXOR:			return "BXOR";
 			case opcodes::BNOT:			return "BNOT";
+			case opcodes::LSHIFT:		return "LSHIFT";
+			case opcodes::RSHIFT:		return "RSHIFT";
 			case opcodes::ADD:			return "ADD";
 			case opcodes::SUB:			return "SUB";
 			case opcodes::MUL:			return "MUL";
 			case opcodes::DIV:			return "DIV";
 			case opcodes::POW:			return "POW";
 			case opcodes::MOD:			return "MOD";
+			case opcodes::UNM:			return "UNM";
 			case opcodes::INCR:			return "INCR";
 			case opcodes::DECR:			return "DECR";
 			case opcodes::NEWLIST:		return "NEWLIST";

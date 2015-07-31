@@ -5,12 +5,15 @@
 #define GET_RA(E, I)	(E->get(GET_A(I)))
 #define GET_RB(E, I)	(E->get(GET_B(I)))
 #define GET_RC(E, I)	(E->get(GET_C(I)))
+#define GET_RBC(E, I)	(E->get(GET_B(I) - GET_C(I)))
 
 #define GET_KB(I)		(k_store[GET_B(I)])
 #define GET_KC(I)		(k_store[GET_C(I)])
+#define GET_KBC(I)		(k_store[GET_B(I) - GET_C(I)])
 
 #define GET_RKB(E, I)	(IS_BK(I) ? GET_KB(I) : GET_RB(E, I))
 #define GET_RKC(E, I)	(IS_CK(I) ? GET_KC(I) : GET_RC(E, I))
+#define GET_RKBC(E, I)	((IS_BK(I) || IS_CK(I)) ? GET_KBC(I) : GET_RBC(E, I))
 
 #define SET_R(E, N, V)	(E->set(N, V))
 
@@ -44,9 +47,9 @@ namespace exo {
 			exo::instruction I = *pc;
 			exo::opcodes::opcode OP = GET_OP(I);
 			
-			std::cout << std::endl;
-			std::cout << pc << ": " << opcode_name(OP) << "\t" << GET_A(I) << " " << IS_BK(I) << " " << GET_B(I) << " " << IS_CK(I) << " " << GET_C(I);
-			std::cout << "\t(" << GET_A(I) << " " << GET_T(I) << " " << (int)GET_Bx(I) << ")" << std::endl;
+			//std::cout << std::endl;
+			//std::cout << pc << ": " << opcode_name(OP) << "\t" << GET_A(I) << " " << IS_BK(I) << " " << GET_B(I) << " " << IS_CK(I) << " " << GET_C(I);
+			//std::cout << "\t(" << GET_A(I) << " " << GET_T(I) << " " << (int)GET_Bx(I) << ")" << std::endl;
 		
 			switch (OP) {
 			case opcodes::NOOP:
@@ -63,11 +66,11 @@ namespace exo {
 				break;
 				
 			case opcodes::MOVE:
-				SET_R(E, GET_A(I), GET_RKB(E, I));
+				SET_R(E, GET_A(I), GET_RKBC(E, I));
 				break;
 
 			case opcodes::PUSH:
-				E->push(GET_RKB(E, I));
+				E->push(GET_RKBC(E, I));
 				break;
 				
 			case opcodes::RTN:
@@ -116,6 +119,14 @@ namespace exo {
 			case opcodes::BNOT:
 				SET_R(E, GET_A(I), ~GET_RKB(E, I));
 				break;
+
+			case opcodes::LSHIFT:
+				SET_R(E, GET_A(I), GET_RKB(E, I) << GET_RKC(E, I));
+				break;
+
+			case opcodes::RSHIFT:
+				SET_R(E, GET_A(I), GET_RKB(E, I) >> GET_RKC(E, I));
+				break;
 				
 			case opcodes::ADD: 	
 				SET_R(E, GET_A(I), GET_RKB(E, I) + GET_RKC(E, I));
@@ -141,6 +152,10 @@ namespace exo {
 				SET_R(E, GET_A(I), GET_RKB(E, I) % GET_RKC(E, I));
 				break;
 
+			case opcodes::UNM:
+				SET_R(E, GET_A(I), -GET_RKB(E, I));
+				break;
+
 			case opcodes::INCR:
 				SET_R(E, GET_A(I), GET_RA(E, I) + one);
 				break;
@@ -150,7 +165,13 @@ namespace exo {
 				break;
 				
 			case opcodes::NEWLIST:
-				SET_R(E, GET_A(I), new list);
+				{
+					auto l = new list;
+					for (int i=GET_B(I); i>=1; --i) {
+						l->push_back(E->get(-i));
+					}
+					SET_R(E, GET_A(I), l);
+				}
 				break;
 				
 			case opcodes::NEWMAP:
@@ -187,7 +208,7 @@ namespace exo {
 			
 			pc++;
 			
-			E->stack.print_stack();
+			//E->stack.print_stack();
 			//system("pause");
 		}
 	}

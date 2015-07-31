@@ -42,8 +42,6 @@ namespace exo {
 			LEN,			// #
 			CONCAT,			// ..
 			
-			UNM,			// -
-			
 			EQUAL,			// ==
 			LT,				// <
 			LE,				// <=
@@ -54,11 +52,16 @@ namespace exo {
 			NOT,			// !
 			AND,			// &&
 			OR,				// ||
+
+			UNM,			// placeholder for precedence
+			UNP,			// placeholder for precedence
 			
 			BNOT,			// ~
 			BAND,			// &
 			BOR,			// |
 			XOR,			// @
+			LSHIFT,			// >>
+			RSHIFT,			// <<
 			
 			DECL,			// decl
 			IF, 			// if
@@ -90,4 +93,76 @@ namespace exo {
 	};
 	
 	token_result tokenise(const std::string &);
+
+	inline int precedence(tokens::token tk) {
+		switch(tk) {
+		// 1
+		case tokens::NAMESPACE:
+			return 1;
+
+		// 2
+		case tokens::LPAREN:
+		case tokens::LINDEX:
+		case tokens::ACCESS:
+			return 2;
+
+		// 3
+		case tokens::UNM:
+		case tokens::UNP:
+		case tokens::NOT:
+		case tokens::BNOT:
+			return 3;
+
+		// 5
+		case tokens::MUL:
+		case tokens::DIV:
+		case tokens::MOD:
+			return 5;
+
+		// 6
+		case tokens::ADD:
+		case tokens::SUB:
+			return 6;
+
+		// 7
+		case tokens::LSHIFT:
+		case tokens::RSHIFT:
+			return 7;
+
+		// 8
+		case tokens::LT:
+		case tokens::LE:
+		case tokens::GT:
+		case tokens::GE:
+			return 8;
+
+		// 9
+		case tokens::EQUAL:
+		case tokens::NOTEQL:
+			return 9;
+
+		// 10
+		case tokens::BAND:
+			return 10;
+
+		// 11
+		case tokens::XOR:
+			return 11;
+
+		// 12
+		case tokens::BOR:
+			return 12;
+
+		// 13
+		case tokens::AND:
+			return 13;
+
+		// 14
+		case tokens::OR:
+			return 14;
+
+		default:
+			return 99;
+		}
+	}
 }

@@ -162,6 +162,18 @@ namespace exo {
 				throw invalid_binop_error(STRING, b.get_type());
 			}
 			break;
+
+		case LIST:
+			switch (b.get_type()) {
+			case LIST:
+				ra = a;
+				rb = b;
+				break;
+
+			default:
+				throw invalid_binop_error(LIST, b.get_type());
+			}
+			break;
 			
 		default:
 			throw invalid_binop_error(a.get_type(), b.get_type());
@@ -366,16 +378,22 @@ namespace exo {
 			
 		case LIST:
 			{
-				char c[20];
-				snprintf(c, 20, "list: 0x%p", (void *)u_map);
-				return std::string(c);
+				std::string s;
+				s += "[";
+				for (const value &v : *u_list)
+					s = s + v.to_string() + ", ";
+				s += "]";
+				return s;
 			}
 		
 		case MAP:
 			{
-				char c[20];
-				snprintf(c, 20, "map: 0x%p", (void *)u_map);
-				return std::string(c);
+				std::string s;
+				s += "{";
+				for (const auto &v : *u_map)
+					s = s + v.first.to_string() + ": " + v.second.to_string() + ", ";
+				s += "}";
+				return s;
 			}
 			
 		case STRING:
@@ -405,12 +423,13 @@ namespace exo {
 		
 		int act_r;
 		if (type == NFUNCTION)
-			act_r = u_nfunc(s);
+			act_r = u_nfunc(s, args);
 		else
 			act_r = u_func->call(s);
 		
 		act_r = act_r < 0 ? s->stack.frame_size() - args : act_r;
 		rets = rets < 0 ? act_r : rets;
+
 		s->stack.pop_frame(act_r, rets);
 		
 		return act_r;
@@ -596,6 +615,14 @@ namespace exo {
 			return a.u_int + b.u_int;
 		case BYTE:
 			return a.u_byte + b.u_byte;
+		case LIST:
+			{
+				list *l = new list();
+				l->reserve(a.u_list->size() + b.u_list->size());
+				l->insert(l->end(), a.u_list->begin(), a.u_list->end());
+				l->insert(l->end(), b.u_list->begin(), b.u_list->end());
+				return l;
+			}
 		default:
 			throw invalid_binop_error(a.get_type(), b.get_type());
 		}
@@ -617,6 +644,19 @@ namespace exo {
 			return a.u_byte - b.u_byte;
 		default:
 			throw invalid_binop_error(a.get_type(), b.get_type());
+		}
+	}
+
+	value value::operator-() const {	
+		switch (get_type()) {
+		case NUMBER:
+			return -u_num;
+		case INTEGER:
+			return -u_int;
+		case BYTE:
+			return -u_byte;
+		default:
+			throw invalid_unop_error(get_type());
 		}
 	}
 	
@@ -723,6 +763,40 @@ namespace exo {
 			return a.u_int ^ b.u_int;
 		case BYTE:
 			return a.u_byte ^ b.u_byte;
+		default:
+			throw invalid_binop_error(a.get_type(), b.get_type());
+		}
+	}
+
+	value value::operator<<(const value &o) const {
+		value a, b;
+		promote(*this, o, a, b);
+		
+		if (a.get_type() == NIL || b.get_type() == NIL)
+			throw invalid_binop_error(a.get_type(), b.get_type());
+			
+		switch (a.get_type()) {
+		case INTEGER:
+			return a.u_int << b.u_int;
+		case BYTE:
+			return a.u_byte << b.u_byte;
+		default:
+			throw invalid_binop_error(a.get_type(), b.get_type());
+		}
+	}
+
+	value value::operator>>(const value &o) const {
+		value a, b;
+		promote(*this, o, a, b);
+		
+		if (a.get_type() == NIL || b.get_type() == NIL)
+			throw invalid_binop_error(a.get_type(), b.get_type());
+			
+		switch (a.get_type()) {
+		case INTEGER:
+			return a.u_int << b.u_int;
+		case BYTE:
+			return a.u_byte << b.u_byte;
 		default:
 			throw invalid_binop_error(a.get_type(), b.get_type());
 		}

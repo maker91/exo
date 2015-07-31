@@ -17,7 +17,7 @@ namespace exo {
 	typedef std::vector<value> 					list;
 	typedef std::unordered_map<value, value> 	map;
 	
-	typedef int (*nfunction)(state *);
+	typedef int (*nfunction)(state *, int);
 	
 	enum type : byte {
 		NIL,

@@ -52,8 +52,8 @@ namespace exo {
 		void do_while();
 		void do_if();
 		void do_for();
-		int do_expression();
-		void do_sub_expression(int r);
+		int do_expression(int prec = 99);
+		void do_sub_expression(int r, int prec);
 		std::vector<std::string> do_identifier_list(tokens::token, const std::string &);
 		void do_function();
 		void do_function(int r);

@@ -57,7 +57,7 @@ namespace exo {
         consume(tokens::RBRACE, "}");
 	}
 
-	int compiler::do_expression() {
+	int compiler::do_expression(int prec) {
 		opcodes::opcode op = opcodes::MOVE;
 		int r = next_register++;
 
@@ -97,117 +97,196 @@ namespace exo {
 			
 		case tokens::LPAREN:
 			consume(tokens::LPAREN, "(");
-			next_register--;
+			next_register = r;
 			do_expression();	
 			consume(tokens::RPAREN, ")");
 			break;
 
-		case tokens::NOT:
-			++p;
-			next_register--;
-			do_expression();
-			I.push_back(MAKE_ABC(opcodes::NOT, r, 0, r, 0, 0));
+		case tokens::LINDEX:
+			{
+				consume(tokens::LINDEX, "[");
+				int inits = do_param_list(tokens::RINDEX, "]");
+				consume(tokens::RINDEX, "]");
+				I.push_back(MAKE_ABC(opcodes::NEWLIST, r, 0, inits, 0, 0));
+			}
 			break;
+
+		case tokens::LBRACE:
+			{
+				consume(tokens::LBRACE, "{");
+				consume(tokens::RBRACE, "}");
+				I.push_back(MAKE_ABC(opcodes::NEWMAP, r, 0, 0, 0, 0));
+			}
+			break;
+
+		case tokens::NOT:
+			{
+				++p;
+				next_register = r;
+				do_expression(precedence(tokens::NOT));
+				I.push_back(MAKE_ABC(opcodes::NOT, r, 0, r, 0, 0));
+			}
+			break;
+
+		case tokens::BNOT:
+			{
+				++p;
+				next_register = r;
+				do_expression(precedence(tokens::BNOT));
+				I.push_back(MAKE_ABC(opcodes::BNOT, r, 0, r, 0, 0));
+			}
+			break;
+
+		case tokens::SUB:
+			{
+				++p;
+				next_register = r;
+				do_expression(precedence(tokens::UNM));
+				I.push_back(MAKE_ABC(opcodes::UNM, r, 0, r, 0, 0));
+			}
+			break;
+
 		
 		default:
 			throw std::runtime_error(std::to_string(p->line) + ": unexpected symbol '" + p->str + "'");
 		}
 		
-		do_sub_expression(r);
+		do_sub_expression(r, prec);
 		next_register = r+1;
 		return r;
 	}
 
-	void compiler::do_sub_expression(int r) {
+	void compiler::do_sub_expression(int r, int prec) {
+		int this_prec = precedence(p->tk);
+		if (this_prec > prec)
+			return;
+
 		int i;
 		switch (p->tk) {
 		case tokens::ADD:
 			++p;
-			i = do_expression();
+			i = do_expression(this_prec);
 			I.push_back(MAKE_ABC(opcodes::ADD, r, 0, r, 0, i));
 			break;
 			
 		case tokens::SUB:
 			++p;
-			i = do_expression();
+			i = do_expression(this_prec);
 			I.push_back(MAKE_ABC(opcodes::SUB, r, 0, r, 0, i));
 			break;
 			
 		case tokens::MUL:
 			++p;
-			i = do_expression();
+			i = do_expression(this_prec);
 			I.push_back(MAKE_ABC(opcodes::MUL, r, 0, r, 0, i));
 			break;
 			
 		case tokens::DIV:
 			++p;
-			i = do_expression();			
+			i = do_expression(this_prec);			
 			I.push_back(MAKE_ABC(opcodes::DIV, r, 0, r, 0, i));
 			break;
 
 		case tokens::MOD:
 			++p;
-			i = do_expression();			
+			i = do_expression(this_prec);			
 			I.push_back(MAKE_ABC(opcodes::MOD, r, 0, r, 0, i));
+			break;
+
+		case tokens::POW:
+			++p;
+			i = do_expression(this_prec);			
+			I.push_back(MAKE_ABC(opcodes::POW, r, 0, r, 0, i));
 			break;
 			
 		case tokens::LT:
 			++p;
-			i = do_expression();
+			i = do_expression(this_prec);
 			I.push_back(MAKE_ABC(opcodes::LT, r, 0, r, 0, i));
 			break;
 			
 		case tokens::LE:
 			++p;
-			i = do_expression();
+			i = do_expression(this_prec);
 			I.push_back(MAKE_ABC(opcodes::LE, r, 0, r, 0, i));
 			break;
 
 		case tokens::GT:
 			++p;
-			i = do_expression();
+			i = do_expression(this_prec);
 			I.push_back(MAKE_ABC(opcodes::LT, r, 0, i, 0, r));
 			break;
 			
 		case tokens::GE:
 			++p;
-			i = do_expression();
+			i = do_expression(this_prec);
 			I.push_back(MAKE_ABC(opcodes::LE, r, 0, i, 0, r));
 			break;
 
 		case tokens::AND:
 			++p;
-			i = do_expression();
+			i = do_expression(this_prec);
 			I.push_back(MAKE_ABC(opcodes::AND, r, 0, i, 0, r));
 			break;
 
 		case tokens::OR:
 			++p;
-			i = do_expression();
+			i = do_expression(this_prec);
 			I.push_back(MAKE_ABC(opcodes::OR, r, 0, i, 0, r));
+			break;
+
+		case tokens::BAND:
+			++p;
+			i = do_expression(this_prec);
+			I.push_back(MAKE_ABC(opcodes::BAND, r, 0, r, 0, i));
+			break;
+
+		case tokens::BOR:
+			++p;
+			i = do_expression(this_prec);
+			I.push_back(MAKE_ABC(opcodes::BOR, r, 0, r, 0, i));
+			break;
+
+		case tokens::XOR:
+			++p;
+			i = do_expression(this_prec);
+			I.push_back(MAKE_ABC(opcodes::BXOR, r, 0, r, 0, i));
+			break;
+
+		case tokens::LSHIFT:
+			++p;
+			i = do_expression(this_prec);
+			I.push_back(MAKE_ABC(opcodes::LSHIFT, r, 0, r, 0, i));
+			break;
+
+		case tokens::RSHIFT:
+			++p;
+			i = do_expression(this_prec);
+			I.push_back(MAKE_ABC(opcodes::RSHIFT, r, 0, r, 0, i));
 			break;
 
 		case tokens::EQUAL:
 			++p;
-			i = do_expression();
+			i = do_expression(this_prec);
 			I.push_back(MAKE_ABC(opcodes::EQL, r, 0, r, 0, i));
 			break;
 
 		case tokens::CONCAT:
 			++p;
-			i = do_expression();
+			i = do_expression(this_prec);
 			I.push_back(MAKE_ABC(opcodes::CONCAT, r, 0, r, 0, i));
 			break;
 
 		case tokens::LPAREN:  // function call
-			do_function_call(r, 0);
+			do_function_call(r, -1);
+			I.push_back(MAKE_ABC(opcodes::MOVE, r, 0, 0, 0, 1)); // move the top (return value) to r
 			break;
 			
 		default:
 			return;
 		}
 
-		do_sub_expression(r);
+		do_sub_expression(r, prec);
 	}
 	
 	std::string compiler::do_identifier() {
@@ -362,7 +441,7 @@ namespace exo {
 			I.push_back(MAKE_ABC(opcodes::RTN, 1, 0, 0, 0, 0));
 		} else {
 			int args = do_param_list(tokens::RBRACE, "}");
-			I.push_back(MAKE_ABC(opcodes::RTN, 1, args+1, 0, 0, 0));
+			I.push_back(MAKE_ABC(opcodes::RTN, args+1, 0, 0, 0, 0));
 		}
 	}
 	
@@ -373,7 +452,8 @@ namespace exo {
 			if ((p+1)->tk == tokens::ASSIGNMENT) {
 				do_variable_assignment();
 			} else {
-				do_expression();
+				int r = do_expression();
+				next_register = r;
 			}
 			break;
 
@@ -414,9 +494,21 @@ namespace exo {
 			do_function();
 			break;
 
+		case tokens::GLOBAL:
+			{
+				consume(tokens::GLOBAL, "global");
+				consume(tokens::IDENTIFIER, p->str);
+				int k = (p-1)->k;
+				consume(tokens::ASSIGNMENT, "=");
+				int r = do_expression();
+				I.push_back(MAKE_ABC(opcodes::SETGLOBAL, 0, 1, k, 0, r));
+			}
+			break;
+
 		default:
 			{
-				do_expression();
+				int r = do_expression();
+				next_register = r;
 			}
 		}
 	}
@@ -498,14 +590,14 @@ namespace exo {
 			
 		I.push_back(MAKE_ABC(opcodes::RTN, 1, 0, 0, 0, 0));
 		
-		std::cout << "I: " << std::endl;
+		/*std::cout << "I: " << std::endl;
 		for (instruction i : I) {
 			opcodes::opcode op = GET_OP(i);
 			
 			std::cout << opcode_name(op) << "\t" << GET_A(i) << " " << IS_BK(i) << " " << GET_B(i) << " ";
 			std::cout << IS_CK(i) << " " << GET_C(i);
 			std::cout << "\t(" << GET_A(i) << " " << GET_T(i) << " " << (int)GET_Bx(i) << ")" << std::endl;
-		}
+		}*/
 		
 		return new function(I, K);
 	}

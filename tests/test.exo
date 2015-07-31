@@ -1,6 +1,5 @@
-function plus_one(a) {
-    return a+1
+function plus(a, b) {
+    return a+b
 }
 
-for i=1, 10
-    print(plus_one(i))
+print((100 + plus(10, plus(3, 2)))*4)

@@ -63,12 +63,15 @@ namespace exo {
 		
 		value operator+(const value &) const;
 		value operator-(const value &) const;
+		value operator-() const;
 		value operator*(const value &) const;
 		value operator/(const value &) const;
 		value operator%(const value &) const;
 		value operator&(const value &) const;
 		value operator|(const value &) const;
 		value operator^(const value &) const;
+		value operator<<(const value &) const;
+		value operator>>(const value &) const;
 		value operator~() const;
 		
 		bool operator==(const value &) const;

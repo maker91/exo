@@ -157,18 +157,24 @@ namespace exo {
 			} else if (*p == '#') {
 				symbols.emplace_back(tokens::LEN, "#", line);
 				++p;
-			} else if (*p == '<') { // LT or LE
+			} else if (*p == '<') { // LT or LE or LSHIFT
 				++p;
 				if (*p == '=') {
 					symbols.emplace_back(tokens::LE, "<=", line);
 					++p;
+				} else if (*p == '<') {
+					symbols.emplace_back(tokens::LSHIFT, "<<", line);
+					++p;
 				} else {
 					symbols.emplace_back(tokens::LT, "<", line);
 				}
-			} else if (*p == '>') { // GT or GE
+			} else if (*p == '>') { // GT or GE or RSHIFT
 				++p;
 				if (*p == '=') {
 					symbols.emplace_back(tokens::GE, ">=", line);
+					++p;
+				} else if (*p == '>') {
+					symbols.emplace_back(tokens::RSHIFT, ">>", line);
 					++p;
 				} else {
 					symbols.emplace_back(tokens::GT, ">", line);
