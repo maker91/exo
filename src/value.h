@@ -51,6 +51,7 @@ namespace exo {
 		byte 	to_byte() const;
 		boolean to_boolean() const;
 		string 	to_string() const;
+		string  repr() const;
 		
 		int call(state *, int, int);
 		
@@ -78,7 +79,6 @@ namespace exo {
 		bool operator<(const value &) const;
 		bool operator<=(const value &) const;
 	};
-	
 	
 	/*
 		binary operand promotion

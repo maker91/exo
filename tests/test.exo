@@ -1,5 +1,13 @@
-function plus(a, b) {
-    return a+b
+function create_gen(a) {
+    n = a
+    return function() {
+	print(n)
+    }
 }
 
-print((100 + plus(10, plus(3, 2)))*4)
+f1 = create_gen(1)
+f2 = create_gen(2)
+
+f1()
+f1()
+f2()

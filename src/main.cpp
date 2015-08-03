@@ -5,32 +5,8 @@
 #include "token.h"
 #include "compiler.h"
 #include "state.h"
+#include "builtins.h"
 
-int print(exo::state *E, int args) {
-	for (int i=0; i<args; ++i) {
-		if (i) 
-			std::cout << "\t";
-		exo::value v = E->get(i);
-		std::cout << v.to_string();
-	}
-	std::cout << std::endl;
-	
-	return 0;
-}
-
-int getline(exo::state *E, int args) {
-	if (args)
-		std::cout << E->get(0).to_string() << " ";
-	std::string s;
-	std::getline(std::cin, s);
-	E->push(s);
-	return 1;
-}
-
-int to_integer(exo::state *E, int args) {
-	E->push(E->get(0).to_integer());
-	return 1;
-}
 
 int main(int argc, char **argv) {
 	if (argc < 2) {
@@ -46,6 +22,10 @@ int main(int argc, char **argv) {
 			std::ifstream ifs(argv[1]);
 			src = std::string((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
 		}
+
+		// create state and register builtins
+		exo::state E;
+		exo::register_builtins(&E);
 	
 		// tokenise source
 		exo::token_result res = exo::tokenise(src);
@@ -57,8 +37,8 @@ int main(int argc, char **argv) {
 		std::cout << std::endl;*/
 		
 		// compile tokens
-		std::vector<exo::symbol>::iterator start = std::begin(res.symbols);
-		exo::compiler c(res.constants, start, std::end(res.symbols));
+		exo::compiler c(std::begin(res.symbols), std::end(res.symbols), 
+			res.constants, E.builtins);
 		exo::function *func = c.compile();
 		//std::cout << std::endl;
 
@@ -68,12 +48,6 @@ int main(int argc, char **argv) {
 			std::cout << exo::type_name(v.get_type()) << ": " << v.to_string() << std::endl;
 		}
 		std::cout << std::endl;*/
-		
-		// create state and register global definitions
-		exo::state E;
-		E.set_global("print", print);
-		E.set_global("getline", getline);
-		E.set_global("int", to_integer);
 		
 		// run script
 		//std::cout << "output: " << std::endl;

@@ -47,11 +47,7 @@ namespace exo {
 				s.push_back('\0');
 				std::string str(&s[0]);
 				
-				if (str == "global")
-					symbols.emplace_back(tokens::GLOBAL, str, line);
-				else if (str == "decl")
-					symbols.emplace_back(tokens::DECL, str, line);
-				else if (str == "true")
+				if (str == "true")
 					symbols.emplace_back(tokens::BOOLEAN, str, line);
 				else if (str == "false")
 					symbols.emplace_back(tokens::BOOLEAN, str, line);
@@ -61,8 +57,6 @@ namespace exo {
 					symbols.emplace_back(tokens::FUNCTION, str, line);
 				else if (str == "return")
 					symbols.emplace_back(tokens::RETURN, str, line);
-				else if (str == "namespace")
-					symbols.emplace_back(tokens::NAMESPACE, str, line);
 				else if (str == "if")
 					symbols.emplace_back(tokens::IF, str, line);
 				else if (str == "else")
@@ -77,6 +71,8 @@ namespace exo {
 					symbols.emplace_back(tokens::BREAK, str, line);
 				else if (str == "continue")
 					symbols.emplace_back(tokens::CONTINUE, str, line);
+				else if (str == "outer")
+					symbols.emplace_back(tokens::OUTER, str, line);
 				else {
 					value v(str);
 					auto loc = std::find(K.begin(), K.end(), v);
@@ -128,14 +124,9 @@ namespace exo {
 				} else {
 					symbols.emplace_back(tokens::ACCESS, ".", line);
 				}
-			} else if (*p == ':') { // resolution?
+			} else if (*p == ':') {
+				symbols.emplace_back(tokens::LABEL, ":", line);
 				++p;
-				if (*p == ':') {
-					symbols.emplace_back(tokens::RESOLUTION, "::", line);
-					++p;
-				} else {
-					throw std::runtime_error(std::to_string(line) + ": unexpected symbol near ':'");
-				}
 			} else if (*p == '+') {
 				symbols.emplace_back(tokens::ADD, "+", line);
 				++p;

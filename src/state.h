@@ -13,7 +13,7 @@ namespace exo {
 	// make this private
 	public:
 		exo::stack 	stack;
-		exo::map	globals;
+		exo::map	builtins;
 		
 	public:
 		void push(const value &);
@@ -21,11 +21,10 @@ namespace exo {
 		
 		void set(int, const value &);
 		value get(int);
-		
-		void set_global(const value &, const value &);
-		value get_global(const value &);
 
 		void push_scope(int i);
 		void pop_scope();
+
+		void register_builtin(const std::string &name, const exo::value &builtin);
 	};
 }

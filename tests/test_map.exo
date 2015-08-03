@@ -1,0 +1,3 @@
+map = {"foo": "bar", 1: "The One True God"}
+print(map)
+print(map[1])

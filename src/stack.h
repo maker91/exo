@@ -23,6 +23,8 @@ namespace exo {
 		
 		void push(const value &);
 		void pop();
+
+		int get_absolute(int);
 		
 		value &get(int p);
 		value &get_in_frame(int p);

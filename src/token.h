@@ -10,10 +10,10 @@ namespace exo {
 	
 		enum token {
 			INVALID,
-			GLOBAL,			// global
 			IDENTIFIER,		// [_a-zA-Z][_0-9a-zA-Z]+
 			SEPARATOR,		// ,
 			ASSIGNMENT,		// =
+			LABEL,			// :
 			
 			BOOLEAN,
 			CONSTANT,
@@ -21,7 +21,6 @@ namespace exo {
 			
 			FUNCTION,		// function
 			RETURN,			// return
-			NAMESPACE,		// namespace
 			
 			LINDEX,			// [
 			RINDEX,			// ]
@@ -31,7 +30,6 @@ namespace exo {
 			RPAREN,			// )
 			
 			ACCESS,			// .
-			RESOLUTION,		// ::
 			
 			ADD,			// +
 			SUB,			// -
@@ -63,7 +61,6 @@ namespace exo {
 			LSHIFT,			// >>
 			RSHIFT,			// <<
 			
-			DECL,			// decl
 			IF, 			// if
 			ELSE,			// else
 			FOR,			// for
@@ -71,6 +68,7 @@ namespace exo {
 			DO,				// do
 			BREAK,			// break
 			CONTINUE,		// continue
+			OUTER			// outer
 		};
 	}
 	
@@ -96,10 +94,6 @@ namespace exo {
 
 	inline int precedence(tokens::token tk) {
 		switch(tk) {
-		// 1
-		case tokens::NAMESPACE:
-			return 1;
-
 		// 2
 		case tokens::LPAREN:
 		case tokens::LINDEX:
@@ -111,6 +105,7 @@ namespace exo {
 		case tokens::UNP:
 		case tokens::NOT:
 		case tokens::BNOT:
+		case tokens::LEN:
 			return 3;
 
 		// 5

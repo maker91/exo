@@ -34,6 +34,15 @@ namespace exo {
 		// if (top < frame.top())
 			// throw out_of_bounds_error(-1, 0);
 	}
+
+	int stack::get_absolute(int p) {
+		if (p < 0)
+			p = top + p;
+		else
+			p = frame.top() + p;
+
+		return p;
+	}
 	
 	value &stack::get(int p) {
 		if (p < 0)
@@ -46,14 +55,11 @@ namespace exo {
 	}
 	
 	value &stack::get_in_frame(int p) {
-		if (p < 0)
-			p = top + p;
-		else
-			p = frame.top() + p;
-	
+		p = get_absolute(p);
+
 		if (p >= (int)top || p < (int)frame.top())
 			throw out_of_bounds_error(p, top);
-			
+
 		return store[p];
 	}
 	
@@ -71,10 +77,7 @@ namespace exo {
 	}
 	
 	void stack::set_in_frame(int p, const value &v) {
-		if (p < 0)
-			p = top + p;
-		else
-			p = frame.top() + p;
+		p = get_absolute(p);
 	
 		if (p >= EXO_STACK_SIZE || p < (int)frame.top())
 			throw out_of_bounds_error(p, top);

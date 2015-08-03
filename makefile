@@ -1,7 +1,7 @@
 CC			= g++
 CFLAGS		= -stdlib=libc++ -std=c++11 -Wall -Wextra -pedantic -g -Wno-reorder
 LDFLAGS		= 
-SOURCES		= src/main.cpp src/compiler.cpp src/exception.cpp src/function.cpp src/stack.cpp src/state.cpp src/token.cpp src/value.cpp
+SOURCES		= src/main.cpp src/compiler.cpp src/exception.cpp src/function.cpp src/stack.cpp src/state.cpp src/token.cpp src/value.cpp src/builtins.cpp
 OBJECTS		= $(patsubst %.cpp, %.o, $(patsubst src/%, obj/%, ${SOURCES}))
 EXECUTABLE	= bin/exo
 

@@ -7,64 +7,57 @@
 #include "function.h"
 
 namespace exo {
-
-	struct namespace_info {
-		std::string name;
+	struct lexical_scope {
 		std::map<std::string, int> L;
-		std::map<std::string, namespace_info *> children;
-		namespace_info *parent;
+		std::vector<lexical_scope> children;
+		lexical_scope *parent;
 
-		namespace_info(const std::string &name) : name(name), parent(nullptr) {};
+		lexical_scope() : parent(nullptr) {}
+		lexical_scope(lexical_scope *p) : parent(p) {}
 
-		std::string get_full_name() {
-			std::string n = "";
-			if (parent != nullptr)
-				n += (parent->get_full_name() + "::");
-			return (n + name);
+		lexical_scope *new_scope() {
+			children.emplace_back(this);
+			return &children.back();
 		}
 	};
 
-
 	class compiler {
 	private:
-		std::vector<symbol>::iterator &p;
+		std::vector<symbol>::iterator p;
 		std::vector<symbol>::iterator end;
 		
-		int next_register;
-		
-		namespace_info *N; //current namespace
-		std::vector<instruction> I;
+		exo::map builtins;
 		std::vector<value> &K;
+		std::map<std::string, int> B;
+
+		lexical_scope root;
+		lexical_scope *current_scope;
 	
 	public:
-		compiler(std::vector<value> &constants, std::vector<symbol>::iterator &start, std::vector<symbol>::iterator end);
-		compiler(std::vector<value> &constants, std::vector<symbol>::iterator &start, 
-			std::vector<symbol>::iterator end, std::vector<std::string> params);
-		function *compile();
+		compiler(std::vector<symbol>::iterator start, std::vector<symbol>::iterator end, 
+			std::vector<value> &constants, exo::map builtins);
+		function *compile(std::vector<std::string> params = {});
 		
 	private:
 		void consume(tokens::token, const std::string &);
 	
-		void do_block();
-		void do_statement();
-		void do_variable_assignment();
-		void do_function_call(int, int);
-		void do_while();
-		void do_if();
-		void do_for();
-		int do_expression(int prec = 99);
-		void do_sub_expression(int r, int prec);
-		std::vector<std::string> do_identifier_list(tokens::token, const std::string &);
-		void do_function();
-		void do_function(int r);
-		void do_return();
-		int do_param_list(tokens::token, const std::string &);
+		void do_block(std::vector<instruction> &I, int &next_register);
+		void do_statement(std::vector<instruction> &I, int &next_register);
+		int do_variable_assignment(std::vector<instruction> &I, int &next_register);
+		void do_function_call(std::vector<instruction> &I, int &next_register, int, int);
+		void do_while(std::vector<instruction> &I, int &next_register);
+		void do_if(std::vector<instruction> &I, int &next_register);
+		void do_for(std::vector<instruction> &I, int &next_register);
+		int do_expression(std::vector<instruction> &I, int &next_register, int prec = 99);
+		void do_sub_expression(std::vector<instruction> &I, int &next_register, int r, int prec);
+		void do_function(std::vector<instruction> &I, int &next_register);
+		void do_function(std::vector<instruction> &I, int &next_register, int r);
+		void do_return(std::vector<instruction> &I, int &next_register);
+		int do_expression_list(std::vector<instruction> &I, int &next_register, tokens::token, const std::string &);
+		int do_pair_list(std::vector<instruction> &I, int &next_register, tokens::token, const std::string &);
 		
-		std::string do_identifier();
-		
-		int get_local(const std::string &, namespace_info *n);
-		int get_local(const std::string &);
-
-		namespace_info* lookup_namespace();
+		std::string get_identifier();
+		std::vector<std::string> get_identifier_list(std::vector<instruction> &I, int &next_register);
+		int get_local(const std::string &name, bool recursive = true);
 	};
 }

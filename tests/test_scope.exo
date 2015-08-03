@@ -1,0 +1,30 @@
+print("without outer")
+a = "|"
+print(a)
+{
+    a = "  |"
+    print(a)
+    {
+	a = "   |"
+	print(a)
+    }
+    print(a)
+}
+print(a)
+
+print("with outer")
+b = "|"
+print(b)
+{
+    outer b = "||"
+    b = "  |"
+    print(b)
+    {
+	outer outer b = "||"
+	outer b = "  ||"
+	b = "    |"
+	print(b)
+    }
+    print(b)
+}
+print(b)

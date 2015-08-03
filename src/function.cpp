@@ -47,10 +47,10 @@ namespace exo {
 			exo::instruction I = *pc;
 			exo::opcodes::opcode OP = GET_OP(I);
 			
-			//std::cout << std::endl;
-			//std::cout << pc << ": " << opcode_name(OP) << "\t" << GET_A(I) << " " << IS_BK(I) << " " << GET_B(I) << " " << IS_CK(I) << " " << GET_C(I);
-			//std::cout << "\t(" << GET_A(I) << " " << GET_T(I) << " " << (int)GET_Bx(I) << ")" << std::endl;
-		
+			std::cout << std::endl;
+			std::cout << pc << ": " << opcode_name(OP) << "\t" << GET_A(I) << " " << IS_BK(I) << " " << GET_B(I) << " " << IS_CK(I) << " " << GET_C(I);
+			std::cout << "\t(" << GET_A(I) << " " << GET_T(I) << " " << (int)GET_Bx(I) << ")" << std::endl;
+
 			switch (OP) {
 			case opcodes::NOOP:
 				break;
@@ -175,7 +175,13 @@ namespace exo {
 				break;
 				
 			case opcodes::NEWMAP:
-				SET_R(E, GET_A(I), new map);
+				{
+					auto m = new map;
+					for (int i=2*GET_B(I); i>=2; i-=2) {
+						(*m)[E->get(-i)] = E->get(-i+1);
+					}
+					SET_R(E, GET_A(I), m);
+				}
 				break;
 				
 			case opcodes::SET:
@@ -194,21 +200,13 @@ namespace exo {
 				SET_R(E, GET_A(I), GET_RKB(E, I).concat(GET_RKC(E, I)));
 				break;
 				
-			case opcodes::SETGLOBAL:
-				E->set_global(GET_RKB(E, I), GET_RKC(E, I));
-				break;
-				
-			case opcodes::GETGLOBAL:
-				SET_R(E, GET_A(I), E->get_global(GET_RKB(E, I)));
-				break;
-				
 			default:
 				break;
 			}
 			
 			pc++;
 			
-			//E->stack.print_stack();
+			E->stack.print_stack();
 			//system("pause");
 		}
 	}

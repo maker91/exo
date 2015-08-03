@@ -88,9 +88,6 @@ namespace exo {
 			LEN,		// R[A] = length(RK[B])
 			CONCAT,		// R[A] = RK[B] .. RK[C]
 			
-			SETGLOBAL,	// _G[RK[B]] = RK[C]
-			GETGLOBAL,	// R[A] = _G[RK[B]]
-			
 			COUNT		// opcode count
 		};
 	}	
@@ -131,8 +128,6 @@ namespace exo {
 			case opcodes::GET:			return "GET";
 			case opcodes::LEN:			return "LEN";
 			case opcodes::CONCAT:		return "CONCAT";
-			case opcodes::SETGLOBAL:	return "SETGLOB";
-			case opcodes::GETGLOBAL:	return "GETGLOB";
 			
 			case opcodes::COUNT:
 			default:					return "INVALID";

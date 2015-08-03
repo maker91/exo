@@ -184,11 +184,18 @@ namespace exo {
 		: type(NIL) {}
 		
 	value::value(const value &o)
-		: type(o.type), data(o.data) {}
+		: type(o.type), data(o.data)
+	{
+		if (o.type == STRING)
+			u_string = o.u_string;
+	}
 		
 	value &value::operator=(const value &o) {
 		type = o.type;
 		data = o.data;
+
+		if (type == STRING)
+			u_string = o.u_string;
 		
 		return *this;
 	}
@@ -359,6 +366,16 @@ namespace exo {
 	
 	string value::to_string() const {
 		switch (type) {
+		case STRING:
+			return u_string;
+			
+		default:
+			return repr();
+		}
+	}
+
+	string value::repr() const {
+		switch (type) {
 		case NUMBER:
 			return std::to_string(u_num);
 			
@@ -380,8 +397,14 @@ namespace exo {
 			{
 				std::string s;
 				s += "[";
-				for (const value &v : *u_list)
-					s = s + v.to_string() + ", ";
+				bool first = true;
+				for (const value &v : *u_list) {
+					if (!first)
+						s = s + ", ";
+					else
+						first = false;
+					s = s + v.repr();
+				}
 				s += "]";
 				return s;
 			}
@@ -390,14 +413,20 @@ namespace exo {
 			{
 				std::string s;
 				s += "{";
-				for (const auto &v : *u_map)
-					s = s + v.first.to_string() + ": " + v.second.to_string() + ", ";
+				bool first = true;
+				for (const auto &v : *u_map) {
+					if (!first)
+						s = s + ", ";
+					else
+						first = false;
+					s = s + v.first.repr() + ": " + v.second.repr();
+				}
 				s += "}";
 				return s;
 			}
 			
 		case STRING:
-			return u_string;
+			return "\"" + u_string + "\"";
 			
 		case FUNCTION:
 			{
@@ -509,7 +538,7 @@ namespace exo {
 			switch (o.type) {
 			case INTEGER:		
 			case BYTE:
-				return u_string[o.to_integer()];
+				return string(&u_string[o.to_integer()], 1);
 				break;
 				
 			default:
@@ -593,12 +622,8 @@ namespace exo {
 	value value::concat(const value &o) const {
 		if (type == NIL || o.type == NIL)
 			throw invalid_concat_error();
-			
-		std::string r;
-		r += to_string();
-		r += o.to_string();
 		
-		return r;
+		return exo::value(to_string() + o.to_string());
 	}
 	
 	value value::operator+(const value &o) const {
