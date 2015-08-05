@@ -26,7 +26,7 @@
 #define GET_A(i)	((i>>18) & 0xFF)
 #define GET_B(i)	((i>>9) & 0xFF)
 #define GET_uBx(i)	(i & 0xFFFF)
-#define GET_Bx(i)	(((i>>16) & 0x01)==0x01 ? -GET_uBx(i) : GET_uBx(i))
+#define GET_Bx(i)	(IS_BxS(i) ? -GET_uBx(i) : GET_uBx(i))
 #define GET_C(i)	(i & 0xFF)
 #define GET_T(i)	((i>>17) & 0x01)
 
@@ -42,51 +42,55 @@ namespace exo {
 	typedef std::uint32_t instruction;
 
 	namespace opcodes {
+		// S = stack, R = registers, K = constants
+		// SR = use push/pop or register based on instruction
+		// RK = use registers or constants based on instruction
+		// SRK = use pop or register or constant based on instruction
 		enum opcode {
 			NOOP,		// Do nothing
-			
-			MOVE,		// R[A] = RK[B - C]
-			PUSH,		// R[top] = RK[B - C]
+
+			LOAD,		// SR[A] = SRK[B - C]
+			BUILTIN,	// SR[A] = builtins[SRK[B]]
 			
 			JMP,		// pc += Bx
-			TEST,		// if R[A] == Bool(T) then pc += Bx
-			RTN,		// return R[top - A-1]...R[top] 							(A-1==-1 -> return whole stack minus parameters)
-			CALL,		// R[top]...R[top + A-1] = R[B](R[top - C-1]...R[top]) 		(A-1==-1 -> accept all returns) (C-1==-1 -> pass whole stack as parameters)
+			TEST,		// if SR[A] == Bool(T) then pc += Bx
+			RTN,		// return A-1 values from top of stack. if A-1==-1 -> return whole stack
+			CALL,		// push A-1 returns of R[B](C args from the top of the stack) if A-1==-1 -> accept all returns.
 			
-			EQL,		// R[A] = RK[B]==RK[C]
-			LT,			// R[A] = RK[B]<RK[C]
-			LE,			// R[A] = RK[B]<=RK[C]
+			EQL,		// SR[A] = SRK[B] == SRK[C]
+			LT,			// SR[A] = SRK[B] < SRK[C]
+			LE,			// SR[A] = SRK[B] <= SRK[C]
 			
-			AND,		// R[A] = RK[B] && RK[C]
-			OR,			// R[A] = RK[B] || RK[C]
-			NOT,		// R[A] = !RK[B]
+			AND,		// SR[A] = SRK[B] && SRK[C]
+			OR,			// SR[A] = SRK[B] || SRK[C]
+			NOT,		// SR[A] = !SRK[B]
 			
-			BAND,		// R[A] = RK[B] & RK[C]
-			BOR,		// R[A] = RK[B] | RK[C]
-			BXOR,		// R[A] = RK[B] @ RK[C]
-			BNOT,		// R[A] = ~RK[B]
+			BAND,		// SR[A] = SRK[B] & SRK[C]
+			BOR,		// SR[A] = SRK[B] | SRK[C]
+			BXOR,		// SR[A] = SRK[B] ^ SRK[C]
+			BNOT,		// SR[A] = ~SRK[B]
 
-			LSHIFT,		// R[A] = RK[B] << RK[C]
-			RSHIFT,		// R[A] = RK[B] << RK[C]
+			LSHIFT,		// SR[A] = SRK[B] << SRK[C]
+			RSHIFT,		// SR[A] = SRK[B] >> SRK[C]
 			
-			ADD,		// R[A] = RK[B] + RK[C]
-			SUB,		// R[A] = RK[B] + RK[C]
-			MUL,		// R[A] = RK[B] + RK[C]
-			DIV,		// R[A] = RK[B] + RK[C]
-			POW,		// R[A] = RK[B] ^ RK[C]
-			MOD,		// R[A] = RK[B] % RK[C]
-			UNM,		// R[A] = -RK[B]
+			ADD,		// SR[A] = SRK[B] + SRK[C]
+			SUB,		// SR[A] = SRK[B] - SRK[C]
+			MUL,		// SR[A] = SRK[B] * SRK[C]
+			DIV,		// SR[A] = SRK[B] / SRK[C]
+			POW,		// SR[A] = SRK[B] ** SRK[C]
+			MOD,		// SR[A] = SRK[B] % SRK[C]
+			UNM,		// SR[A] = -SRK[B]
 
-			INCR,		// R[A] = R[A] + 1
-			DECR,		// R[A] = R[A] - 1
+			INCR,		// SR[A] = SR[A] + 1
+			DECR,		// SR[A] = SR[A] - 1
 			
-			NEWLIST,	// R[A] = list(R[top - B] .. R[top])
-			NEWMAP,		// R[A] = map
-			SET,		// R[A][RK[B]] = RK[C]
-			GET,		// R[A] = R[B][RK[C]]
+			NEWLIST,	// SR[A] = list(S[-B] .. S[-1])
+			NEWMAP,		// SR[A] = map(S[-B]: S[-B+1] .. S[-2]: S[-1])
+			SETITEM,	// SR[A][SRK[B]] = SRK[C]
+			GETITEM,	// SR[A] = SR[B][SRK[C]]
 			
-			LEN,		// R[A] = length(RK[B])
-			CONCAT,		// R[A] = RK[B] .. RK[C]
+			LEN,		// SR[A] = length(SRK[B])
+			CONCAT,		// SR[A] = concat(SRK[A], SRK[C])
 			
 			COUNT		// opcode count
 		};
@@ -95,8 +99,8 @@ namespace exo {
 	inline string opcode_name(opcodes::opcode o) {
 		switch (o) {
 			case opcodes::NOOP:			return "NOOP";
-			case opcodes::MOVE:			return "MOVE";
-			case opcodes::PUSH:			return "PUSH";
+			case opcodes::LOAD:			return "LOAD";
+			case opcodes::BUILTIN:		return "BUILTIN";
 			case opcodes::JMP:			return "JMP";
 			case opcodes::TEST:			return "TEST";
 			case opcodes::RTN:			return "RTN";
@@ -124,8 +128,8 @@ namespace exo {
 			case opcodes::DECR:			return "DECR";
 			case opcodes::NEWLIST:		return "NEWLIST";
 			case opcodes::NEWMAP:		return "NEWMAP";
-			case opcodes::SET:			return "SET";
-			case opcodes::GET:			return "GET";
+			case opcodes::SETITEM:		return "SETITEM";
+			case opcodes::GETITEM:		return "GETITEM";
 			case opcodes::LEN:			return "LEN";
 			case opcodes::CONCAT:		return "CONCAT";
 			

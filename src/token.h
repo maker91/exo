@@ -35,7 +35,7 @@ namespace exo {
 			SUB,			// -
 			MUL,			// *
 			DIV,			// /
-			POW,			// ^
+			POW,			// **
 			MOD,			// %
 			LEN,			// #
 			CONCAT,			// ..
@@ -57,7 +57,7 @@ namespace exo {
 			BNOT,			// ~
 			BAND,			// &
 			BOR,			// |
-			XOR,			// @
+			XOR,			// ^
 			LSHIFT,			// >>
 			RSHIFT,			// <<
 			

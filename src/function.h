@@ -11,11 +11,13 @@ namespace exo {
 	private:
 		std::vector<instruction> 	i_store;
 		std::vector<value>			k_store;
+		int 						param_start;
+		int 						num_params;
 		
 	public:
-		function();
-		function(const std::vector<instruction> &);
-		function(const std::vector<instruction> &, const std::vector<value> &);
+		function(int pstart, int pnum);
+		function(int pstart, int pnum, const std::vector<instruction> &);
+		function(int pstart, int pnum, const std::vector<instruction> &, const std::vector<value> &);
 		
 		~function();
 		

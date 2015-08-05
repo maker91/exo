@@ -134,13 +134,18 @@ namespace exo {
 				symbols.emplace_back(tokens::SUB, "-", line);
 				++p;
 			} else if (*p == '*') {
-				symbols.emplace_back(tokens::MUL, "*", line);
 				++p;
+				if (*p == '*') {
+					symbols.emplace_back(tokens::POW, "**", line);
+					++p;
+				} else {
+					symbols.emplace_back(tokens::MUL, "*", line);
+				}
 			} else if (*p == '/') {
 				symbols.emplace_back(tokens::DIV, "/", line);
 				++p;
 			} else if (*p == '^') {
-				symbols.emplace_back(tokens::POW, "^", line);
+				symbols.emplace_back(tokens::XOR, "^", line);
 				++p;
 			} else if (*p == '%') {
 				symbols.emplace_back(tokens::MOD, "%", line);

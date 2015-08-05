@@ -1,7 +1,7 @@
 function create_gen(a) {
     n = a
     return function() {
-	print(n)
+	print(1)
     }
 }
 

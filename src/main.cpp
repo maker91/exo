@@ -43,11 +43,13 @@ int main(int argc, char **argv) {
 		//std::cout << std::endl;
 
 		// print constants
-		/*std::cout << "K: " << std::endl;
+		std::cout << "K: " << std::endl;
+		int i = 0;
 		for (exo::value &v : res.constants) {
-			std::cout << exo::type_name(v.get_type()) << ": " << v.to_string() << std::endl;
+			std::cout << "[" << i << "]\t" << exo::type_name(v.get_type()) << ": " << v.to_string() << std::endl;
+			i++;
 		}
-		std::cout << std::endl;*/
+		std::cout << std::endl;
 		
 		// run script
 		//std::cout << "output: " << std::endl;

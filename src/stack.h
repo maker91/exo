@@ -22,7 +22,7 @@ namespace exo {
 		unsigned frame_size() const;
 		
 		void push(const value &);
-		void pop();
+		value &pop();
 
 		int get_absolute(int);
 		

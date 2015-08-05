@@ -451,10 +451,11 @@ namespace exo {
 		s->stack.push_frame(args);
 		
 		int act_r;
-		if (type == NFUNCTION)
+		if (type == NFUNCTION) {
 			act_r = u_nfunc(s, args);
-		else
+		} else {
 			act_r = u_func->call(s);
+		}
 		
 		act_r = act_r < 0 ? s->stack.frame_size() - args : act_r;
 		rets = rets < 0 ? act_r : rets;

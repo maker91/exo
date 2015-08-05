@@ -1,23 +1,24 @@
 #include "state.h"
+#include <iostream>
 
 namespace exo {
-	void state::push(const value &v) {
-		stack.push(v);
-	}
-	
-	void state::pop() {
-		stack.pop();
-	}	
-	
-	void state::set(int i, const value &v) {
-		stack.set_in_frame(i, v);
-	}
-	
-	value state::get(int i) {
-		return stack.get_in_frame(i);
-	}
-
 	void state::register_builtin(const std::string &name, const exo::value &builtin) {
 		builtins[name] = builtin;
+	}
+
+	void state::print_stack() {
+		std::cout << "======= STACK:" << std::endl;
+		stack.print_stack();
+	}
+
+	void state::print_registers() {
+		std::cout << "======= REGISTERS:" << std::endl;
+		for (int i=0; i<EXO_NUM_REGISTERS; ++i) {
+			const exo::value &v = registers[i];
+			if (v.get_type() == exo::type::NIL)
+				break;
+
+			std::cout << "[" << i << "]\t" << v.to_string() << std::endl;
+		}
 	}
 }

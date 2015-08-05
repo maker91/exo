@@ -28,11 +28,10 @@ namespace exo {
 		set(top, v);
 	}
 	
-	void stack::pop() {
+	value &stack::pop() {
+		value &r = get(-1);
 		top--;
-		
-		// if (top < frame.top())
-			// throw out_of_bounds_error(-1, 0);
+		return r; 
 	}
 
 	int stack::get_absolute(int p) {
