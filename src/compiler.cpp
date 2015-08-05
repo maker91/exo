@@ -574,7 +574,9 @@ namespace exo {
 		consume(tokens::RPAREN, ")");
 
 		current_scope = current_scope->new_scope();
+		int saved_register = next_register;
 		K.emplace_back(compile(params));
+		next_register = saved_register;
 		current_scope = current_scope->parent;
 
 		// replace with NEWCLOSURE instruction when I figure out how
@@ -590,7 +592,9 @@ namespace exo {
 		consume(tokens::RPAREN, ")");
 
 		current_scope = current_scope->new_scope();
+		int saved_register = next_register;
 		K.emplace_back(compile(params));
+		next_register = saved_register;
 		current_scope = current_scope->parent;
 
 		// replace with NEWCLOSURE instruction when I figure out how
