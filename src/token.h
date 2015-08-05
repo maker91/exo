@@ -108,53 +108,53 @@ namespace exo {
 		case tokens::LEN:
 			return 3;
 
-		// 5
+		// 4
 		case tokens::MUL:
 		case tokens::DIV:
 		case tokens::MOD:
+			return 4;
+
+		// 5
+		case tokens::ADD:
+		case tokens::SUB:
 			return 5;
 
 		// 6
-		case tokens::ADD:
-		case tokens::SUB:
+		case tokens::LSHIFT:
+		case tokens::RSHIFT:
 			return 6;
 
 		// 7
-		case tokens::LSHIFT:
-		case tokens::RSHIFT:
-			return 7;
-
-		// 8
 		case tokens::LT:
 		case tokens::LE:
 		case tokens::GT:
 		case tokens::GE:
+			return 7;
+
+		// 8
+		case tokens::BAND:
 			return 8;
 
 		// 9
-		case tokens::EQUAL:
-		case tokens::NOTEQL:
+		case tokens::XOR:
 			return 9;
 
 		// 10
-		case tokens::BAND:
+		case tokens::BOR:
 			return 10;
 
 		// 11
-		case tokens::XOR:
+		case tokens::EQUAL:
+		case tokens::NOTEQL:
 			return 11;
 
 		// 12
-		case tokens::BOR:
+		case tokens::AND:
 			return 12;
 
 		// 13
-		case tokens::AND:
-			return 13;
-
-		// 14
 		case tokens::OR:
-			return 14;
+			return 13;
 
 		default:
 			return 99;
