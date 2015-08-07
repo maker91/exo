@@ -78,22 +78,35 @@ namespace exo {
 		
 	}
 	
-	int function::call(state *E) {
+	int function::call(state *E, int args) {
 		exo::instruction *pc = &i_store[0];
 		exo::value one = exo::value(1);
+		exo::value nil = exo::value();
 
 		// params are stored on the stack - 
-		// they need to be moved to registers based on param_start and num_params
-		for (int i = 1; i<=num_params; ++i)
-			SET_R(E, param_start + num_params - i, POP(E));
+		// they need to be moved to registers based on param_start, num_params and the number of args
+		// actually passed in (args)
+		while (args > num_params) {
+			POP(E);
+			args--;
+		}
+
+		for (int i = 1; i<=num_params; ++i) {
+			if (i > args)
+				SET_R(E, param_start + num_params - i, nil);
+			else
+				SET_R(E, param_start + num_params - i, POP(E));
+		}
 		
 		while (true) {	
 			exo::instruction I = *pc;
 			exo::opcodes::opcode OP = GET_OP(I);
 			
+			/*
 			std::cout << std::endl;
 			std::cout << pc << ": " << opcode_name(OP) << "\t" << GET_A(I) << " " << IS_BK(I) << " " << GET_B(I) << " " << IS_CK(I) << " " << GET_C(I);
 			std::cout << "\t(" << GET_A(I) << " " << GET_T(I) << " " << (int)GET_Bx(I) << ")" << std::endl;
+			*/
 
 			exo::value b, c;
 			switch (OP) {
@@ -294,8 +307,8 @@ namespace exo {
 			
 			pc++;
 			
-			E->print_stack();
-			E->print_registers();
+			//E->print_stack();
+			//E->print_registers();
 		}
 	}
 }

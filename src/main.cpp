@@ -31,10 +31,12 @@ int main(int argc, char **argv) {
 		exo::token_result res = exo::tokenise(src);
 		
 		// print symbols
-		/*for (auto &symbol : res.symbols) {
+		/*
+		for (auto &symbol : res.symbols) {
 			std::cout << "(" << symbol.tk << ") " << symbol.str << " [" << symbol.k << "]" << std::endl; 
 		}
-		std::cout << std::endl;*/
+		std::cout << std::endl;
+		*/
 		
 		// compile tokens
 		exo::compiler c(std::begin(res.symbols), std::end(res.symbols), 
@@ -43,6 +45,7 @@ int main(int argc, char **argv) {
 		//std::cout << std::endl;
 
 		// print constants
+		/*
 		std::cout << "K: " << std::endl;
 		int i = 0;
 		for (exo::value &v : res.constants) {
@@ -50,10 +53,11 @@ int main(int argc, char **argv) {
 			i++;
 		}
 		std::cout << std::endl;
+		*/
 		
 		// run script
 		//std::cout << "output: " << std::endl;
-		func->call(&E);
+		func->call(&E, 0);
 	} catch (std::exception &e) {
 		std::cout << "error: " << e.what() << std::endl;
 	}

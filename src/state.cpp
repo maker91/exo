@@ -13,12 +13,12 @@ namespace exo {
 
 	void state::print_registers() {
 		std::cout << "======= REGISTERS:" << std::endl;
-		for (int i=0; i<EXO_NUM_REGISTERS; ++i) {
-			const exo::value &v = registers[i];
-			if (v.get_type() == exo::type::NIL)
-				break;
 
-			std::cout << "[" << i << "]\t" << v.to_string() << std::endl;
+		int last;
+		for (last=EXO_NUM_REGISTERS-1; last>=0 && registers[last].get_type() == exo::type::NIL; last--);
+
+		for (int i=0; i<=last; ++i) {
+			std::cout << "[" << i << "]\t" << registers[i].to_string() << std::endl;
 		}
 	}
 }

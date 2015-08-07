@@ -82,7 +82,7 @@ namespace exo {
 					if (builtins.count(name))
 						I.push_back(MAKE_ABC(opcodes::BUILTIN, o, 1, (p-1)->k, 0, 0));
 					else
-						throw std::runtime_error(std::to_string(p->line) + ": unknown identifier '" + name);
+						throw std::runtime_error(std::to_string(p->line) + ": unknown identifier '" + name + "'");
 				} else {
 					r = l;
 				}
@@ -90,7 +90,7 @@ namespace exo {
 			break;
 
 		case tokens::FUNCTION:
-			do_anonymous_function(I);
+			do_anonymous_function(I, o);
 			break;
 			
 		case tokens::LPAREN:
@@ -299,15 +299,18 @@ namespace exo {
 			// ensure that functions are stored in a register so they can be called properly
 			// the register is only temporary
 			if (r == -1) {
-				r = next_register;
+				r = next_register++;
 				I.push_back(MAKE_ABC(opcodes::LOAD, r, 0, -1, 0, 0));
 			}
 			do_function_call(I, r, -1);
+			// move the return values into the required registers
+			if (o != -1)
+				I.push_back(MAKE_ABC(opcodes::LOAD, o, 0, -1, 0, 0));
 			break;
 
 		case tokens::LINDEX:  // index
 			consume(tokens::LINDEX, "[");
-			i = do_expression(I, this_prec);
+			i = do_expression(I, -1, false);
 			I.push_back(MAKE_ABC(opcodes::GETITEM, o, 0, r, 0, i));
 			consume(tokens::RINDEX, "]");
 			break;
@@ -493,7 +496,10 @@ namespace exo {
 			break;
 
 		case tokens::FUNCTION:
-			do_function(I);
+			if ((p+1)->tk == tokens::IDENTIFIER)
+				do_function(I);
+			else
+				do_expression(I);
 			break;
 
 		case tokens::OUTER:
@@ -518,7 +524,7 @@ namespace exo {
 				break;
 			} else if ((p+1)->tk == tokens::SEPARATOR) {
 				// identifier list assignment
-
+				break;
 			}
 			// fall through
 
@@ -529,9 +535,15 @@ namespace exo {
 					consume(tokens::LINDEX, "[");
 					int i = do_expression(I);
 					consume(tokens::RINDEX, "]");
-					consume(tokens::ASSIGNMENT, "=");
-					int v = do_expression(I);
-					I.push_back(MAKE_ABC(opcodes::SETITEM, r, 0, i, 0, v));
+					if (p->tk == tokens::ASSIGNMENT) {
+						consume(tokens::ASSIGNMENT, "=");
+						int v = do_expression(I);
+						I.push_back(MAKE_ABC(opcodes::SETITEM, r, 0, i, 0, v));
+					} else {
+						// do the sub expression
+						I.push_back(MAKE_ABC(opcodes::GETITEM, r, 0, r, 0, i));
+						do_sub_expression(I, -1, r, 99);
+					}
 				} else {
 					// do the sub expression
 					do_sub_expression(I, -1, r, 99);
@@ -574,9 +586,7 @@ namespace exo {
 		consume(tokens::RPAREN, ")");
 
 		current_scope = current_scope->new_scope();
-		int saved_register = next_register;
 		K.emplace_back(compile(params));
-		next_register = saved_register;
 		current_scope = current_scope->parent;
 
 		// replace with NEWCLOSURE instruction when I figure out how
@@ -584,7 +594,7 @@ namespace exo {
 		I.push_back(MAKE_ABC(opcodes::LOAD, r, 1, K.size() - 1, 0, 0));
 	}
 
-	void compiler::do_anonymous_function(std::vector<instruction> &I) {
+	void compiler::do_anonymous_function(std::vector<instruction> &I, int o) {
 		consume(tokens::FUNCTION, "function");
 		
 		consume(tokens::LPAREN, "(");
@@ -592,14 +602,12 @@ namespace exo {
 		consume(tokens::RPAREN, ")");
 
 		current_scope = current_scope->new_scope();
-		int saved_register = next_register;
 		K.emplace_back(compile(params));
-		next_register = saved_register;
 		current_scope = current_scope->parent;
 
 		// replace with NEWCLOSURE instruction when I figure out how
 		// to do the goddamn things
-		I.push_back(MAKE_ABC(opcodes::LOAD, -1, 1, K.size() - 1, 0, 0));
+		I.push_back(MAKE_ABC(opcodes::LOAD, o, 1, K.size() - 1, 0, 0));
 	}
 
 	function *compiler::compile(std::vector<std::string> params) {
@@ -616,6 +624,7 @@ namespace exo {
 			
 		I.push_back(MAKE_ABC(opcodes::RTN, 1, 0, 0, 0, 0));
 		
+		/*
 		std::cout << "I: " << std::endl;
 		for (instruction i : I) {
 			opcodes::opcode op = GET_OP(i);
@@ -624,6 +633,7 @@ namespace exo {
 			std::cout << IS_CK(i) << " " << GET_C(i);
 			std::cout << "\t(" << GET_A(i) << " " << GET_T(i) << " " << (int)GET_Bx(i) << ")" << std::endl;
 		}
+		*/
 
 		return new function(param_start, params.size(), I, K);
 	}

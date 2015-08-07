@@ -201,19 +201,19 @@ namespace exo {
 	}
 		
 	value::value(number n)
-		: type(NUMBER), data((size_t)n) {}
+		: type(NUMBER), data(0) {u_num = n;}
 		
 	value::value(integer i)
-		: type(INTEGER), data((size_t)i) {}
+		: type(INTEGER), data(0) {u_int = i;}
 		
 	value::value(byte b)
-		: type(BYTE), data((size_t)b) {}
+		: type(BYTE), data(0) {u_byte = b;}
 		
 	value::value(boolean b)
-		: type(BOOLEAN), data((size_t)b) {}
+		: type(BOOLEAN), data(0) {u_bool = b;}
 		
 	value::value(string s)
-		: type(STRING), u_string(s) {}
+		: type(STRING), data(0) {u_string = s;}
 		
 	value::value(const char *s)
 		: value(string(s)) {}
@@ -377,7 +377,14 @@ namespace exo {
 	string value::repr() const {
 		switch (type) {
 		case NUMBER:
-			return std::to_string(u_num);
+			{
+				std::string s = std::to_string(u_num);
+				// trim trailing 0s
+				s.erase(s.find_last_not_of('0') + 1, std::string::npos);
+				if (s.back() == '.')
+					s = s + "0";
+				return s;
+			}
 			
 		case INTEGER: 
 			return std::to_string(u_int);
@@ -454,7 +461,7 @@ namespace exo {
 		if (type == NFUNCTION) {
 			act_r = u_nfunc(s, args);
 		} else {
-			act_r = u_func->call(s);
+			act_r = u_func->call(s, args);
 		}
 		
 		act_r = act_r < 0 ? s->stack.frame_size() - args : act_r;
@@ -472,9 +479,8 @@ namespace exo {
 		switch (type) {
 		case STRING:
 			return u_string == o.u_string;
-			
 		default:
-			return data == o.data;	
+			return data == o.data;
 		}	
 	}
 	

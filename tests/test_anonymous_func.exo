@@ -1,0 +1,13 @@
+function(a) {
+    print(a)
+}("A")
+
+function(func, a) {
+    return func(a)
+}(print, "B")
+
+function(h) {
+    return function(a) {
+        print(h, a)
+    }
+}("Heuy")("C")

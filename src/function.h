@@ -21,6 +21,6 @@ namespace exo {
 		
 		~function();
 		
-		int call(state *);
+		int call(state *E, int args);
 	};
 }

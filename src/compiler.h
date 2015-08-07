@@ -51,7 +51,7 @@ namespace exo {
 		int do_expression(std::vector<instruction> &I, int o=-1, bool force_out=false, int prec = 99);
 		int do_sub_expression(std::vector<instruction> &I, int o, int r, int prec);
 		void do_function(std::vector<instruction> &I);
-		void do_anonymous_function(std::vector<instruction> &I);
+		void do_anonymous_function(std::vector<instruction> &I, int o);
 		void do_return(std::vector<instruction> &I);
 		int do_expression_list(std::vector<instruction> &I);
 		int do_pair_list(std::vector<instruction> &I);
